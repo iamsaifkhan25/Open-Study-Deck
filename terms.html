@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-LTBKKM734X"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-LTBKKM734X');
+  </script>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Terms & Conditions | Open Study Deck</title>
+  
+  <meta name="description" content="Read our terms and conditions. Open Study Deck is a free, open-source, client-side visual study card workstation.">
+  <link rel="canonical" href="https://openstudydeck.com/terms.html">
+  <meta name="robots" content="index, follow">
+  
+  <!-- Fonts: Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="style.css">
+  
+  <!-- Favicon and Manifest -->
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="manifest" href="/site.webmanifest">
+  
+  <!-- Back to Top Button Component -->
+  <script type="module" src="back-to-top.js"></script>
+</head>
+<body>
+  <script>
+    if (localStorage.getItem('theme') === 'dark') {
+      document.body.classList.add('dark-mode');
+    }
+  </script>
+
+  <!-- FIXED TOP LEFT LOGO BRAND -->
+  <a href="index.html" class="fixed-header-logo show" id="fixed-logo" style="text-decoration: none;">
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M19 3H5C3.89543 3 3 3.89543 3 5V19C3 20.1046 3.89543 21 5 21H19C20.1046 21 21 20.1046 21 19V5C21 3.89543 20.1046 3 19 3Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+      <path d="M7 8H17" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      <path d="M7 12H17" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      <path d="M7 16H13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+    <span class="logo-name">Open Study Deck</span>
+  </a>
+
+  <!-- TOP RIGHT FLOATING UTILITIES -->
+  <div class="top-right-utilities">
+    <button class="utility-circle-btn" id="theme-toggle-btn" aria-label="Toggle Theme">
+      <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+        <circle cx="12" cy="12" r="5"></circle>
+        <line x1="12" y1="1" x2="12" y2="3"></line>
+        <line x1="12" y1="21" x2="12" y2="23"></line>
+        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+        <line x1="1" y1="12" x2="3" y2="12"></line>
+        <line x1="21" y1="12" x2="23" y2="12"></line>
+        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+      </svg>
+      <svg class="moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+      </svg>
+    </button>
+    <a href="index.html" class="utility-circle-btn" data-tooltip="Go Home" aria-label="Home" style="text-decoration: none;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+      </svg>
+    </a>
+  </div>
+
+  <!-- CONTENT WRAPPER -->
+  <div class="scroll-container">
+    <section class="scroll-page studio-page" style="padding-top: 100px;">
+      <div class="page-container" style="max-width: 800px; padding: 0 var(--space-md);">
+        
+        <header class="section-page-header">
+          <span class="page-eyebrow">User Agreements</span>
+          <h2>Terms & Conditions</h2>
+        </header>
+
+        <div class="workspace-card flex-col" style="gap: var(--space-md); padding: var(--space-xl); margin-bottom: var(--space-xl);">
+          <h3 class="settings-card-title">1. Acceptance of Terms</h3>
+          <p class="settings-card-text">By accessing and using Open Study Deck (openstudydeck.com), you acknowledge that you have read, understood, and agree to be bound by these Terms & Conditions. If you do not agree to these terms, please discontinue use of the site immediately.</p>
+
+          <hr class="card-divider">
+
+          <h3 class="settings-card-title">2. Description of Service</h3>
+          <p class="settings-card-text">Open Study Deck is a multi-page, client-side, open-source educational study studio. It provides tools for students to summarize notes, convert screenshots into flashcards, and export formatted revision grids using Google Gemini models. The tool functions completely client-side in the browser.</p>
+
+          <hr class="card-divider">
+
+          <h3 class="settings-card-title">3. Bring Your Own Key (BYOK) Responsibility</h3>
+          <p class="settings-card-text">Open Study Deck does not charge users or sell subscriptions. Accessing AI functionality requires you to input your own personal API Key. By inputting your key, you agree that:</p>
+          <ul class="settings-card-text" style="list-style-type: disc; margin-left: var(--space-lg); space-y: var(--space-xs);">
+            <li>You are responsible for obtaining your key legitimately from Google AI Studio.</li>
+            <li>You agree to abide by Google AI Studio's Terms of Service and usage policies.</li>
+            <li>We have no access to, nor control over, your API keys, usage volumes, or rate limits.</li>
+          </ul>
+
+          <hr class="card-divider">
+
+          <h3 class="settings-card-title">4. User Conduct and File Uploads</h3>
+          <p class="settings-card-text">You retain full ownership of all text notes, textbook pages, images, and lecture documents processed through the interface. You agree not to upload any material that is illegal, offensive, infringes on third-party intellectual property rights, or contains malicious computer code.</p>
+
+          <hr class="card-divider">
+
+          <h3 class="settings-card-title">5. Disclaimer of Warranties</h3>
+          <p class="settings-card-text">Open Study Deck is provided "as is" and "as available" without warranties of any kind, either express or implied. We do not warrant that the website will be uninterrupted, error-free, or that the AI results generated will be completely accurate or correct. Always cross-verify academic information before exams.</p>
+
+          <hr class="card-divider">
+
+          <h3 class="settings-card-title">6. Limitation of Liability</h3>
+          <p class="settings-card-text">In no event shall the developer of Open Study Deck be liable for any direct, indirect, incidental, special, or consequential damages resulting from the use or inability to use the site, including but not limited to loss of academic progress, API key suspension by Google, or loss of study data stored in your local browser storage.</p>
+
+          <hr class="card-divider">
+
+          <h3 class="settings-card-title">7. Changes to Terms</h3>
+          <p class="settings-card-text">We reserve the right to modify these terms at any time. Any changes will be posted on this page with an updated modification timestamp. Your continued use of the website following such changes constitutes your acceptance of the revised Terms.</p>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="app-footer">
+      <div class="footer-inner">
+        <span>Open Study Deck • Privacy-First AI Card Studio</span>
+        <div style="display: flex; gap: var(--space-md); align-items: center; flex-wrap: wrap; justify-content: flex-end;">
+          <a href="about.html" class="scroll-top-link">About Us</a>
+          <a href="privacy.html" class="scroll-top-link">Privacy Policy</a>
+          <a href="terms.html" class="scroll-top-link">Terms & Conditions</a>
+          <a href="contact.html" class="scroll-top-link">Contact Us</a>
+          <a href="index.html#faq-section" class="scroll-top-link">FAQ</a>
+          <a href="index.html" class="scroll-top-link">Home</a>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    const themeBtn = document.getElementById('theme-toggle-btn');
+    const sunIcon = themeBtn.querySelector('.sun-icon');
+    const moonIcon = themeBtn.querySelector('.moon-icon');
+
+    function updateIcons() {
+      const isDark = document.body.classList.contains('dark-mode');
+      if (isDark) {
+        sunIcon.style.display = 'block';
+        moonIcon.style.display = 'none';
+      } else {
+        sunIcon.style.display = 'none';
+        moonIcon.style.display = 'block';
+      }
+    }
+
+    updateIcons();
+
+    themeBtn.addEventListener('click', () => {
+      document.body.classList.toggle('dark-mode');
+      const isDark = document.body.classList.contains('dark-mode');
+      localStorage.setItem('theme', isDark ? 'dark' : 'light');
+      updateIcons();
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-LTBKKM734X"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-LTBKKM734X');
+  </script>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Open Study Deck | Privacy-First AI Study Card Studio</title>
+  
+  <!-- SEO & Social Meta Tags -->
+  <meta name="description" content="A privacy-first, zero-paywall AI study card studio. Generate high-fidelity flashcards, simple explanations, and summaries from textbooks, notes, or links using Google Gemini API locally.">
+  <meta name="keywords" content="flashcards, study app, AI flashcards, Gemini API, textbook summarizer, privacy first study, local study cards, AI Flashcard Generator from Image, convert picture to flashcards online, photo to study notes converter, textbook screenshot summarizer ai">
+  <link rel="canonical" href="https://openstudydeck.com/">
+  <meta name="robots" content="index, follow">
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:title" content="Open Study Deck | Privacy-First AI Study Card Studio">
+  <meta property="og:description" content="Generate beautiful, exportable digital flashcards and summaries from notes or links with your own Gemini API key. Zero SaaS paywalls.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://openstudydeck.com/">
+
+  <!-- Twitter Cards -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Open Study Deck | Privacy-First AI Study Card Studio">
+  <meta name="twitter:description" content="Generate high-fidelity study cards and outlines from notes or links with your own Gemini API key. Zero SaaS paywalls.">
+
+  <!-- Schema.org JSON-LD Structured Data for WebApplication -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Open Study Deck",
+    "url": "https://openstudydeck.com/",
+    "description": "A privacy-first, zero-paywall AI study card studio. Generate digital active-recall flashcards, simple explanations (ELI5), and outlines from textbooks, screenshots, or notes using the Google Gemini API locally in your browser.",
+    "applicationCategory": "EducationalApplication",
+    "operatingSystem": "All",
+    "browserRequirements": "Requires JavaScript. Requires HTML5.",
+    "offers": {
+      "@type": "Offer",
+      "price": "0.00",
+      "priceCurrency": "USD"
+    },
+    "featureList": [
+      "AI Flashcard Generator from Image",
+      "Convert picture to flashcards online",
+      "Textbook screenshot summarizer AI",
+      "Photo to study notes converter",
+      "Privacy-first local processing",
+      "Export flashcards as PNG"
+    ]
+  }
+  </script>
+  
+  <!-- Fonts: Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="style.css">
+  
+  <!-- Favicon and Manifest -->
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="manifest" href="/site.webmanifest">
+  
+  <!-- Back to Top Button Component -->
+  <script type="module" src="back-to-top.js"></script>
+  
+  <!-- HTML2Canvas library (captures advanced styling and layouts cleanly) -->
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js" defer></script>
+  
+  <!-- Tailwind CSS Play CDN (Preflight disabled to protect existing layout resets) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: ['class', '.dark-mode'],
+      corePlugins: {
+        preflight: false,
+      }
+    }
+  </script>
+</head>
+<body>
+
+  <!-- FIXED TOP LEFT LOGO BRAND -->
+  <div class="fixed-header-logo initial-large show" id="fixed-logo">
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M19 3H5C3.89543 3 3 3.89543 3 5V19C3 20.1046 3.89543 21 5 21H19C20.1046 21 21 20.1046 21 19V5C21 3.89543 20.1046 3 19 3Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+      <path d="M7 8H17" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      <path d="M7 12H17" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      <path d="M7 16H13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+    <span class="logo-name">Open Study Deck</span>
+  </div>
+
+  <!-- TOP RIGHT FLOATING UTILITIES -->
+  <div class="top-right-utilities">
+    <button class="utility-circle-btn" id="theme-toggle-btn" data-tooltip="Toggle Dark Mode" aria-label="Toggle Theme">
+      <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+        <circle cx="12" cy="12" r="5"></circle>
+        <line x1="12" y1="1" x2="12" y2="3"></line>
+        <line x1="12" y1="21" x2="12" y2="23"></line>
+        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+        <line x1="1" y1="12" x2="3" y2="12"></line>
+        <line x1="21" y1="12" x2="23" y2="12"></line>
+        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+      </svg>
+      <svg class="moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+      </svg>
+    </button>
+    <a href="#faq-section" class="utility-circle-btn" id="faq-trigger" data-tooltip="View FAQ" aria-label="FAQ Section" style="text-decoration: none;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"></circle>
+        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+        <line x1="12" y1="17" x2="12.01" y2="17"></line>
+      </svg>
+    </a>
+    <button class="utility-circle-btn" id="api-modal-trigger" data-tooltip="Configure API Key" aria-label="API Settings">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+      </svg>
+    </button>
+    <button class="utility-circle-btn" id="support-modal-trigger" data-tooltip="Support Creator" aria-label="Support Creator">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M18 8h1a4 4 0 0 1 0 8h-1"></path>
+        <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path>
+        <line x1="6" y1="1" x2="6" y2="4"></line>
+        <line x1="10" y1="1" x2="10" y2="4"></line>
+        <line x1="14" y1="1" x2="14" y2="4"></line>
+      </svg>
+    </button>
+  </div>
+
+  <!-- FLOATING NAVIGATION DOCK -->
+  <nav class="floating-nav-dock" aria-label="Main Navigation">
+    <a href="#home-section" class="nav-dock-item active" data-tooltip="Home">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+      </svg>
+    </a>
+    <a href="#studio-section" class="nav-dock-item" data-tooltip="Studio Workstation">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
+      </svg>
+    </a>
+    <a href="#library-section" class="nav-dock-item" data-tooltip="My Library">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="3" width="7" height="9" rx="1"></rect>
+        <rect x="14" y="3" width="7" height="5" rx="1"></rect>
+        <rect x="14" y="12" width="7" height="9" rx="1"></rect>
+        <rect x="3" y="16" width="7" height="5" rx="1"></rect>
+      </svg>
+    </a>
+    <a href="#settings-section" class="nav-dock-item" data-tooltip="API Settings">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="3"></circle>
+        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+      </svg>
+    </a>
+  </nav>
+
+  <!-- WEBSITE APP CONTAINER -->
+  <div class="scroll-container">
+    
+    <!-- PAGE 1: HOME/LANDING PAGE -->
+    <header id="home-section" class="scroll-page hero-page">
+      <div class="hero-content">
+        <!-- Center hero logo removed; handled by top-left animated branding -->
+        <!-- Placeholder for mobile logo positioning at scrollY = 0 -->
+        <div class="mobile-logo-placeholder" id="mobile-logo-placeholder"></div>
+        <h1 class="hero-title">Zero Paywalls. Privacy-First.<br>Your local study studio.</h1>
+        <p class="hero-subtitle">Bypass SaaS subscriptions by bringing your own Gemini API key. Convert notes, textbooks, and resources into beautifully styled, exportable study cards locally inside your browser.</p>
+        
+        <div class="hero-actions">
+          <a href="#studio-section" class="btn btn-primary btn-hero">Launch Workstation</a>
+          <a href="#settings-section" class="btn btn-secondary btn-hero">Configure API Key</a>
+        </div>
+
+        <div class="hero-links" style="display: flex; gap: var(--space-md); justify-content: center; margin-top: var(--space-lg); font-size: 14px; opacity: 0.85; flex-wrap: wrap;">
+          <a href="about.html" class="scroll-top-link" style="color: var(--text-ink); text-decoration: none; font-weight: 500;">About Us</a>
+          <span style="color: var(--text-mute);">•</span>
+          <a href="privacy.html" class="scroll-top-link" style="color: var(--text-ink); text-decoration: none; font-weight: 500;">Privacy Policy</a>
+          <span style="color: var(--text-mute);">•</span>
+          <a href="terms.html" class="scroll-top-link" style="color: var(--text-ink); text-decoration: none; font-weight: 500;">Terms & Conditions</a>
+          <span style="color: var(--text-mute);">•</span>
+          <a href="contact.html" class="scroll-top-link" style="color: var(--text-ink); text-decoration: none; font-weight: 500;">Contact Us</a>
+        </div>
+      </div>
+      
+      <div class="hero-features-strip">
+        <div class="feat-badge">NO Signups</div>
+        <div class="feat-badge">NO Database</div>
+        <div class="feat-badge">100% Client-Side</div>
+      </div>
+    </header>
+
+    <!-- PAGE 2: STUDIO WORKSTATION -->
+    <section id="studio-section" class="scroll-page studio-page">
+      <div class="page-container">
+        
+        <header class="section-page-header">
+          <span class="page-eyebrow">Interactive Space</span>
+          <h2>Studio Workspace</h2>
+          <p>Generate study material context and preview visual outputs.</p>
+        </header>
+
+        <div class="studio-workspace-grid">
+          
+          <!-- LEFT SIDE: INPUT WORKSTATION -->
+          <div class="workspace-card input-card">
+            <div class="tab-control">
+              <button class="tab-btn active" id="tab-image" data-target="image-workplace">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                  <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                  <polyline points="21 15 16 10 5 21"></polyline>
+                </svg>
+                Image Upload
+              </button>
+              <button class="tab-btn" id="tab-text" data-target="text-workplace">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                  <polyline points="14 2 14 8 20 8"></polyline>
+                  <line x1="16" y1="13" x2="8" y2="13"></line>
+                </svg>
+                Text / Web Links
+              </button>
+            </div>
+
+            <!-- Upload Area -->
+            <div class="workplace-section active" id="image-workplace">
+              <div class="drop-zone" id="drop-zone">
+                <input type="file" id="file-input" accept="image/png, image/jpeg" style="display: none;">
+                <div class="drop-zone-prompt">
+                  <div class="upload-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                      <polyline points="17 8 12 3 7 8"></polyline>
+                      <line x1="12" y1="3" x2="12" y2="15"></line>
+                    </svg>
+                  </div>
+                  <span class="upload-text-bold">Drag & Drop notes / textbook images</span>
+                  <span class="upload-text-muted">Supports JPEG, PNG up to 10MB</span>
+                  <button class="btn btn-secondary-sm select-file-trigger" type="button">Browse Files</button>
+                </div>
+                <div class="drop-zone-preview" id="drop-zone-preview" style="display: none;">
+                  <img id="preview-image" src="" alt="Study preview">
+                  <div class="preview-overlay">
+                    <span id="preview-filename">image.png</span>
+                    <button type="button" class="btn btn-danger-sm" id="btn-remove-file">Remove</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Text/Link Area -->
+            <div class="workplace-section" id="text-workplace">
+              <div class="text-input-wrapper">
+                <textarea id="text-input-field" placeholder="Paste notes, textbook paragraphs, code snippets, or paste web links containing learning resources..."></textarea>
+                <div class="textarea-footer">
+                  <span class="char-counter" id="char-counter">0 characters</span>
+                  <button type="button" class="btn-clear-textarea" id="btn-clear-text" style="display: none;">Clear</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Mode selectors -->
+            <div class="mode-toggles-container">
+              <label class="section-label">1. Study Mode</label>
+              <div class="mode-selector-grid">
+                <label class="mode-card" for="mode-summary">
+                  <input type="radio" name="study-mode" id="mode-summary" value="summary" checked>
+                  <div class="mode-card-content">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                      <line x1="8" y1="6" x2="21" y2="6"></line>
+                      <line x1="8" y1="12" x2="21" y2="12"></line>
+                      <line x1="8" y1="18" x2="21" y2="18"></line>
+                      <circle cx="3" cy="6" r="1" fill="currentColor"></circle>
+                      <circle cx="3" cy="12" r="1" fill="currentColor"></circle>
+                      <circle cx="3" cy="18" r="1" fill="currentColor"></circle>
+                    </svg>
+                    <span>Summarize</span>
+                  </div>
+                </label>
+                
+                <label class="mode-card" for="mode-eli5">
+                  <input type="radio" name="study-mode" id="mode-eli5" value="eli5">
+                  <div class="mode-card-content">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <line x1="12" y1="16" x2="12" y2="12"></line>
+                      <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                    </svg>
+                    <span>ELI5 Mode</span>
+                  </div>
+                </label>
+                
+                <label class="mode-card" for="mode-flashcards">
+                  <input type="radio" name="study-mode" id="mode-flashcards" value="flashcards">
+                  <div class="mode-card-content">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                      <rect x="3" y="3" width="7" height="9" rx="1"></rect>
+                      <rect x="14" y="3" width="7" height="5" rx="1"></rect>
+                      <rect x="14" y="12" width="7" height="9" rx="1"></rect>
+                      <rect x="3" y="16" width="7" height="5" rx="1"></rect>
+                    </svg>
+                    <span>Flashcards</span>
+                  </div>
+                </label>
+              </div>
+            </div>
+
+            <!-- Subject Context options -->
+            <div class="advanced-options">
+              <details>
+                <summary class="advanced-summary">
+                  <span>Advanced Settings</span>
+                  <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                  </svg>
+                </summary>
+                <div class="advanced-content">
+                  <div class="form-group">
+                    <label for="model-selector">Gemini Model</label>
+                    <select id="model-selector" class="form-select">
+                      <option value="gemini-2.5-flash" selected>gemini-2.5-flash (Fast & Accurate)</option>
+                      <option value="gemini-2.5-pro">gemini-2.5-pro (Highly Cognitive)</option>
+                      <option value="gemini-1.5-flash">gemini-1.5-flash (Legacy Fast)</option>
+                      <option value="gemini-3.5-flash">gemini-3.5-flash (Experimental)</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label for="system-context-input">Academic Subject Context</label>
+                    <input type="text" id="system-context-input" class="form-input" placeholder="e.g. Astrophysics, Anatomy, Economics">
+                  </div>
+                </div>
+              </details>
+            </div>
+
+            <button type="button" class="btn btn-primary btn-generate" id="generate-btn">
+              <svg class="icon-sparkles" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                <path d="M12 3v1M12 20v1M4 12H3M21 12h-1M18.4 5.6l-.7.7M6.3 17.7l-.7.7M18.4 18.4l-.7-.7M6.3 6.3l-.7-.7M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8z"/>
+              </svg>
+              <span>Analyze & Generate</span>
+            </button>
+          </div>
+
+          <!-- RIGHT SIDE: THE CANVAS VIEWPORT -->
+          <div class="workspace-card canvas-card">
+            
+            <div class="canvas-toolbar">
+              <div class="toolbar-left">
+                <span class="canvas-status" id="deck-title-display">Untitled Study Deck</span>
+              </div>
+              <div class="toolbar-right">
+                <!-- Theme options -->
+                <div class="dropdown-container">
+                  <button class="btn btn-secondary-sm toolbar-btn" id="theme-menu-trigger" aria-haspopup="true" aria-expanded="false" data-tooltip="Canvas Theme">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+                      <path d="M12 2a10 10 0 0 0-10 10c0 5.52 4.48 10 10 10a10 10 0 0 0 10-10c0-2.22-.83-4.25-2.2-5.8L12 2z"></path>
+                    </svg>
+                  </button>
+                  <div class="theme-menu" id="theme-menu">
+                    <button class="theme-option active" data-theme="aura-mesh">
+                      <span class="theme-color-preview aura-mesh"></span>
+                      <span>Aura Mesh</span>
+                    </button>
+                    <button class="theme-option" data-theme="cyber-midnight">
+                      <span class="theme-color-preview cyber-midnight"></span>
+                      <span>Cyber Midnight</span>
+                    </button>
+                    <button class="theme-option" data-theme="sunset-glow">
+                      <span class="theme-color-preview sunset-glow"></span>
+                      <span>Sunset Glow</span>
+                    </button>
+                    <button class="theme-option" data-theme="minimal-grid">
+                      <span class="theme-color-preview minimal-grid"></span>
+                      <span>Minimal Grid</span>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Export card -->
+                <button class="btn btn-secondary-sm toolbar-btn" id="export-png-btn" disabled data-tooltip="Export PNG">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <!-- Actual capture container -->
+            <div class="canvas-viewport" id="canvas-viewport">
+              <div class="card-canvas theme-aura-mesh" id="card-canvas">
+                <div class="glow-elements" id="glow-elements">
+                  <div class="glow-circle glow-cyan"></div>
+                  <div class="glow-circle glow-violet"></div>
+                  <div class="glow-circle glow-pink"></div>
+                </div>
+
+                <!-- The floating study card -->
+                <div class="study-card" id="study-card" data-mode="summary">
+                  
+                  <!-- Empty State -->
+                  <div class="card-empty-state" id="card-empty-state">
+                    <div class="empty-icon-wrapper">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="16" x2="12" y2="12"></line>
+                        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                      </svg>
+                    </div>
+                    <h3>Your Study Deck Awaits</h3>
+                    <p>Enter your Gemini API key in the settings panel below, select study details, and hit "Analyze & Generate".</p>
+                  </div>
+
+                  <!-- Skeletal Loading State -->
+                  <div class="card-loading-state" id="card-loading-state" style="display: none;">
+                    <div class="shimmer-header">
+                      <div class="shimmer-bar shimmer-title"></div>
+                      <div class="shimmer-bar shimmer-meta"></div>
+                    </div>
+                    <div class="shimmer-body">
+                      <div class="shimmer-item">
+                        <div class="shimmer-bar shimmer-label"></div>
+                        <div class="shimmer-bar shimmer-content"></div>
+                      </div>
+                      <div class="shimmer-item">
+                        <div class="shimmer-bar shimmer-label"></div>
+                        <div class="shimmer-bar shimmer-content"></div>
+                      </div>
+                      <div class="shimmer-bar shimmer-box"></div>
+                    </div>
+                  </div>
+
+                  <!-- Injected outputs -->
+                  <div class="card-content-wrapper" id="card-content-wrapper" style="display: none;"></div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- PAGE 3: MY DECK LIBRARY -->
+    <section id="library-section" class="scroll-page library-page">
+      <div class="page-container">
+        
+        <header class="section-page-header">
+          <span class="page-eyebrow">Local Storage</span>
+          <div class="library-header-row">
+            <h2>Study Library</h2>
+            <button class="btn btn-secondary-sm" id="clear-history-btn" style="display: none;">Clear All Decks</button>
+          </div>
+          <p>Browse previously generated study decks cached on this computer.</p>
+        </header>
+
+        <!-- Library Cards Grid -->
+        <div class="library-workspace">
+          <div class="library-grid" id="history-list">
+            <!-- Dynamically populated grid cards -->
+            <div class="history-empty">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="32" height="32">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="9" y1="9" x2="15" y2="9"></line>
+                <line x1="9" y1="13" x2="15" y2="13"></line>
+                <line x1="9" y1="17" x2="13" y2="17"></line>
+              </svg>
+              <h3>No Generated Decks Found</h3>
+              <p>Go to the studio workstation above and generate cards to start building your offline study list.</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- PAGE 4: SETTINGS & FAQ -->
+    <section id="settings-section" class="scroll-page settings-page">
+      <div class="page-container">
+        
+        <header class="section-page-header">
+          <span class="page-eyebrow">Core Configurations</span>
+          <h2>Settings & Instructions</h2>
+          <p>Setup your private API key and read onboarding parameters.</p>
+        </header>
+
+        <div class="settings-grid">
+          
+          <!-- Box 1: Key Management -->
+          <div class="settings-card api-card-highlight flex-col">
+            <h3 class="settings-card-title">Gemini API Key</h3>
+            <p class="settings-card-text">Your API key is saved locally. It is only used to connect directly to official Google servers.</p>
+            
+            <div class="api-status-badge" id="api-status">
+              <span class="status-dot dot-red"></span>
+              <span class="status-text">Key Required</span>
+            </div>
+
+            <div class="input-with-icon">
+              <input type="password" id="api-key-input" placeholder="AIzaSy..." autocomplete="off" aria-label="Google Gemini API Key">
+              <button class="icon-toggle-btn toggle-key-visibility-class" data-target-input="api-key-input" type="button" title="Toggle Visibility">
+                <svg class="icon-eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                  <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                  <line x1="1" y1="1" x2="23" y2="23"></line>
+                </svg>
+              </button>
+            </div>
+
+            <div class="settings-actions">
+              <button class="btn btn-primary btn-save-key-class" data-source-input="api-key-input">Save Key</button>
+              <button class="btn btn-secondary btn-clear-key-class">Clear Key</button>
+            </div>
+          </div>
+
+          <!-- Box 2: Instructions -->
+          <div class="settings-card flex-col">
+            <h3 class="settings-card-title">Setup in 3 Steps</h3>
+            <div class="instruction-timeline">
+              <div class="timeline-step">
+                <div class="step-number">1</div>
+                <div class="step-desc">Go to <a href="https://aistudio.google.com/" target="_blank" rel="noopener">Google AI Studio</a>. Sign in with any free Google account.</div>
+              </div>
+              <div class="timeline-step">
+                <div class="step-number">2</div>
+                <div class="step-desc">Click the prominent blue <strong>"Get API Key"</strong> button on the top sidebar.</div>
+              </div>
+              <div class="timeline-step">
+                <div class="step-number">3</div>
+                <div class="step-desc">Create/choose a project, copy the secret token, and paste it into the field on the left.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Box 3: Privacy & About -->
+          <div class="settings-card span-2 flex-col">
+            <h3 class="settings-card-title">Security & Privacy Statement</h3>
+            <p class="settings-card-text">Open Study Deck operates fully under the <strong>Bring Your Own Key (BYOK)</strong> architecture. Unlike standard study apps, there are <strong>no login forms, no subscription plans, and no analytical trackers</strong>. All image text parsing and card generations are triggered from your own web client directly to Google API interfaces. Your learning documents and API codes stay on your local disk.</p>
+            
+            <hr class="card-divider">
+
+            <div style="display: flex; flex-direction: column; gap: var(--space-xs); margin-bottom: var(--space-sm);">
+              <h4 style="font-size: 14px; font-weight: 600; color: var(--text-ink);">Helpful Resource Pages</h4>
+              <div style="display: flex; gap: var(--space-md); flex-wrap: wrap;">
+                <a href="about.html" class="scroll-top-link" style="font-size: 14px;">About Us</a>
+                <a href="privacy.html" class="scroll-top-link" style="font-size: 14px;">Privacy Policy</a>
+                <a href="terms.html" class="scroll-top-link" style="font-size: 14px;">Terms & Conditions</a>
+                <a href="contact.html" class="scroll-top-link" style="font-size: 14px;">Contact Us</a>
+              </div>
+            </div>
+
+            <hr class="card-divider">
+
+            <div class="creator-donate-banner">
+              <div class="donate-left">
+                <h4>Support the Developer</h4>
+                <p>Open Study Deck is open-source and free of charge. Consider donating if it helps your study flow.</p>
+              </div>
+              <button class="btn btn-primary btn-donate support-modal-trigger-class" id="settings-donate-btn">
+                <span>☕ Buy me a Coffee</span>
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ABOUT SECTION -->
+    <section id="about-section" class="scroll-page py-16 bg-white dark:bg-[#080d16] text-slate-800 dark:text-slate-200">
+      <div class="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
+        
+        <!-- Hero Introduction -->
+        <div class="space-y-4">
+          <h2 class="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight sm:text-4xl leading-tight">
+            Escape the Paywalls
+          </h2>
+          <p class="text-lg leading-relaxed text-slate-600 dark:text-slate-300">
+            Let’s be honest: college is stressful enough without study apps charging you to learn your own notes. You are drowning in 80-page slide decks, tiny font textbooks, and late-night cram sessions. Yet, every popular study tool blocks your learning behind a paywall. Meet Open Study Deck, the ultimate <strong>free alternative to AI study apps</strong>. We built this because you shouldn't have to pay a monthly subscription just to study efficiently. Powered by your own local API, our platform features a next-generation <strong>AI Flashcard Generator from Image</strong> that instantly transforms flat slides and textbook pages into active-recall study guides, without charging you a single dime. No paywalls, no subscription limits—just pure, unadulterated learning.
+          </p>
+        </div>
+
+        <!-- How It Works / The BYOK Edge -->
+        <div class="space-y-4">
+          <h3 class="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
+            How It Works: The BYOK Advantage
+          </h3>
+          <p class="text-base leading-relaxed text-slate-600 dark:text-slate-300">
+            We do things differently. Instead of locking features behind pricing tiers, Open Study Deck operates on a "Bring Your Own Key" (BYOK) architecture. By hooking up a free Gemini API key directly from Google, you unlock a powerful, <strong>unlimited ai text summarizer no signup</strong> required.
+          </p>
+          <p class="text-base leading-relaxed text-slate-600 dark:text-slate-300">
+            Here is why this matters: most study platforms upload your files to their servers, tracking your study habits and charging you when you hit a usage ceiling. Open Study Deck is a <strong>privacy first ai flashcard generator</strong>. Everything happens directly inside your web browser. Your notes, textbook uploads, and generated flashcards remain stored locally on your device. Zero external databases, zero tracking, and absolute data privacy. You get direct, unthrottled access to industry-grade AI models without giving up your email address or your credit card. No third parties ever see your coursework.
+          </p>
+        </div>
+
+        <!-- Core Features Breakdown -->
+        <div class="space-y-6">
+          <h3 class="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
+            AI Flashcard Generator from Image: Your Studio Features
+          </h3>
+          <p class="text-base leading-relaxed text-slate-600 dark:text-slate-300">
+            Open Study Deck is engineered to fit your chaotic study flow. Stop typing out definitions manually and let AI do the heavy lifting. Our visual canvas renders every card in real-time, giving you total creative control.
+          </p>
+          <ul class="grid grid-cols-1 md:grid-cols-2 gap-6 list-none pl-0">
+            <li class="p-6 bg-slate-50 dark:bg-slate-800/40 rounded-xl border border-slate-100 dark:border-slate-800/80 shadow-sm">
+              <strong class="font-semibold text-slate-900 dark:text-white text-base block mb-2">Convert Picture to Flashcards Online:</strong> Simply drag and drop your study slides or textbook screenshots into the workstation. Our system will scan and <strong>extract study cards from image</strong> inputs in seconds, parsing complex diagrams, structures, and tables instantly.
+            </li>
+            <li class="p-6 bg-slate-50 dark:bg-slate-800/40 rounded-xl border border-slate-100 dark:border-slate-800/80 shadow-sm">
+              <strong class="font-semibold text-slate-900 dark:text-white text-base block mb-2">Textbook Screenshot Summarizer AI:</strong> Working through dense, boring chapters? Use our visual processing to <strong>convert image to study guide</strong> summaries. You can toggle between comprehensive outlines or a simplified "Explain Like I'm 5" (ELI5) mode.
+            </li>
+            <li class="p-6 bg-slate-50 dark:bg-slate-800/40 rounded-xl border border-slate-100 dark:border-slate-800/80 shadow-sm">
+              <strong class="font-semibold text-slate-900 dark:text-white text-base block mb-2">Photo to Study Notes Converter:</strong> Snap a picture of your handwritten lecture notes and let the AI instantly clean them up. It acts as a <strong>picture to flashcard maker free</strong> of charge, saving you hours of transcription.
+            </li>
+            <li class="p-6 bg-slate-50 dark:bg-slate-800/40 rounded-xl border border-slate-100 dark:border-slate-800/80 shadow-sm">
+              <strong class="font-semibold text-slate-900 dark:text-white text-base block mb-2">Visual Study Card Maker Online:</strong> Style your study cards to match your aesthetic. Once styled, you can <strong>export flashcards as PNG</strong> files for your digital planner, iPad, or mobile study sessions.
+            </li>
+          </ul>
+        </div>
+
+        <!-- Final Motivating Text Block -->
+        <div class="space-y-4">
+          <h3 class="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
+            The Smartest, Free Online AI Flashcard Maker
+          </h3>
+          <p class="text-base leading-relaxed text-slate-600 dark:text-slate-300">
+            Whether you are preparing for medical boards, analyzing legal case files, or trying to survive organic chemistry, you need tools that keep up with your pace. With Open Study Deck, you can <strong>scan notes to flashcards ai</strong> all day long, completely free of SaaS limits. No more hitting daily usage caps right before a midterm. No more premium subscription popups when you are in the zone.
+          </p>
+          <p class="text-base leading-relaxed text-slate-600 dark:text-slate-300">
+            We refuse to gatekeep education. Open Study Deck was built by self-learners who got tired of subscription fees getting in the way of knowledge. By putting you in charge of your own API access, we guarantee that this visual study studio will remain a zero-cost workspace for all students forever.
+          </p>
+          <p class="text-base leading-relaxed text-slate-600 dark:text-slate-300">
+            It is time to take control of your study workflow. Grab your free Gemini key, drop your first textbook upload into the workstation above, and watch your notes come to life. Your grades shouldn't carry a price tag. Get started today on openstudydeck.com.
+          </p>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- FAQ SECTION -->
+    <section id="faq-section" class="scroll-page py-16 bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 transition-colors duration-300">
+      <div class="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+        
+        <!-- Title Header -->
+        <div class="text-center space-y-4">
+          <h2 class="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight sm:text-4xl leading-tight">
+            Frequently Asked Questions
+          </h2>
+          <p class="text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
+            Everything you need to know about setting up your secure study keys, maintaining visual control, and optimizing your active-recall workspace.
+          </p>
+        </div>
+
+        <!-- FAQ Accordion Layout -->
+        <div class="space-y-6">
+
+          <!-- Category 1: General Project Info -->
+          <div class="space-y-4">
+            <h3 class="text-xl font-bold text-slate-900 dark:text-white border-b border-slate-200 dark:border-slate-800 pb-2">
+              General Info & Infrastructure
+            </h3>
+            
+            <details class="group border border-slate-200 dark:border-slate-800 rounded-xl bg-white dark:bg-slate-900/50 p-6 [&_summary::-webkit-details-marker]:hidden transition-all duration-300">
+              <summary class="flex cursor-pointer items-center justify-between gap-1.5 text-slate-900 dark:text-white font-semibold text-lg select-none">
+                <span>What is Open Study Deck?</span>
+                <span class="relative size-5 shrink-0">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="absolute inset-0 size-5 opacity-100 group-open:opacity-0 transition-opacity duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <svg xmlns="http://www.w3.org/2000/svg" class="absolute inset-0 size-5 opacity-0 group-open:opacity-100 transition-opacity duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </span>
+              </summary>
+              <p class="mt-4 leading-relaxed text-slate-600 dark:text-slate-400 text-base">
+                Open Study Deck is a privacy-first, free visual study card tool designed for high schoolers, university students, and self-learners dealing with massive reading volumes. It operates entirely client-side, using your browser capabilities and the Gemini API to instantly transform textbook screenshots, notes, or web links into styled active-recall decks.
+              </p>
+            </details>
+
+            <details class="group border border-slate-200 dark:border-slate-800 rounded-xl bg-white dark:bg-slate-900/50 p-6 [&_summary::-webkit-details-marker]:hidden transition-all duration-300">
+              <summary class="flex cursor-pointer items-center justify-between gap-1.5 text-slate-900 dark:text-white font-semibold text-lg select-none">
+                <span>Why is this tool completely free? Where is the catch?</span>
+                <span class="relative size-5 shrink-0">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="absolute inset-0 size-5 opacity-100 group-open:opacity-0 transition-opacity duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <svg xmlns="http://www.w3.org/2000/svg" class="absolute inset-0 size-5 opacity-0 group-open:opacity-100 transition-opacity duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </span>
+              </summary>
+              <p class="mt-4 leading-relaxed text-slate-600 dark:text-slate-400 text-base">
+                There is no catch. Instead of locking features behind monthly subscription paywalls, Open Study Deck operates on a "Bring Your Own Key" (BYOK) model. We offer this as a fully functional <strong>free alternative to AI study apps</strong> that gatekeep learning. By linking your own free API key directly from Google AI Studio, you bypass middleman servers and use unthrottled AI endpoints completely for free.
+              </p>
+            </details>
+          </div>
+
+          <!-- Category 2: API Key Management -->
+          <div class="space-y-4">
+            <h3 class="text-xl font-bold text-slate-900 dark:text-white border-b border-slate-200 dark:border-slate-800 pb-2">
+              API Key Configuration
+            </h3>
+
+            <details class="group border border-slate-200 dark:border-slate-800 rounded-xl bg-white dark:bg-slate-900/50 p-6 [&_summary::-webkit-details-marker]:hidden transition-all duration-300">
+              <summary class="flex cursor-pointer items-center justify-between gap-1.5 text-slate-900 dark:text-white font-semibold text-lg select-none">
+                <span>How do I get a free Gemini API Key?</span>
+                <span class="relative size-5 shrink-0">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="absolute inset-0 size-5 opacity-100 group-open:opacity-0 transition-opacity duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <svg xmlns="http://www.w3.org/2000/svg" class="absolute inset-0 size-5 opacity-0 group-open:opacity-100 transition-opacity duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </span>
+              </summary>
+              <div class="mt-4 leading-relaxed text-slate-600 dark:text-slate-400 text-base space-y-2">
+                <p>Obtaining a key takes under a minute, needs no credit card, and ensures an <strong>unlimited ai text summarizer no signup</strong> is required on our platform:</p>
+                <ol class="list-decimal pl-5 space-y-1 font-medium">
+                  <li>Navigate to the official <a href="https://aistudio.google.com/" target="_blank" rel="noopener" class="text-sky-500 hover:underline">Google AI Studio</a> page.</li>
+                  <li>Sign in with any standard Google account and click the blue <strong>"Get API Key"</strong> button on the sidebar.</li>
+                  <li>Choose a project, click <strong>"Create API Key"</strong>, and copy your generated secret token.</li>
+                </ol>
+                <p class="pt-2">Paste this code into the Settings tab on Open Study Deck to hook up your workspace interface.</p>
+              </div>
+            </details>
+
+            <details class="group border border-slate-200 dark:border-slate-800 rounded-xl bg-white dark:bg-slate-900/50 p-6 [&_summary::-webkit-details-marker]:hidden transition-all duration-300">
+              <summary class="flex cursor-pointer items-center justify-between gap-1.5 text-slate-900 dark:text-white font-semibold text-lg select-none">
+                <span>Do I have to generate a new API key every time I visit the site?</span>
+                <span class="relative size-5 shrink-0">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="absolute inset-0 size-5 opacity-100 group-open:opacity-0 transition-opacity duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <svg xmlns="http://www.w3.org/2000/svg" class="absolute inset-0 size-5 opacity-0 group-open:opacity-100 transition-opacity duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </span>
+              </summary>
+              <p class="mt-4 leading-relaxed text-slate-600 dark:text-slate-400 text-base">
+                No. Open Study Deck automatically stores your API key locally in your browser's persistent LocalStorage cache. It acts as a "set it and forget it" integration, so your key remains ready for use every time you reopen the site on this physical machine.
+              </p>
+            </details>
+
+            <details class="group border border-slate-200 dark:border-slate-800 rounded-xl bg-white dark:bg-slate-900/50 p-6 [&_summary::-webkit-details-marker]:hidden transition-all duration-300">
+              <summary class="flex cursor-pointer items-center justify-between gap-1.5 text-slate-900 dark:text-white font-semibold text-lg select-none">
+                <span>Can I use the same API key across my phone and laptop?</span>
+                <span class="relative size-5 shrink-0">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="absolute inset-0 size-5 opacity-100 group-open:opacity-0 transition-opacity duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <svg xmlns="http://www.w3.org/2000/svg" class="absolute inset-0 size-5 opacity-0 group-open:opacity-100 transition-opacity duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </span>
+              </summary>
+              <p class="mt-4 leading-relaxed text-slate-600 dark:text-slate-400 text-base">
+                Yes. The same Google Gemini API key works flawlessly across your laptop, tablet, and mobile phone. However, because Open Study Deck is a serverless application that does not host your credentials in a cloud database (ensuring complete security), you will need to copy and paste the key once into the Settings tab of each individual web browser you use.
+              </p>
+            </details>
+
+            <details class="group border border-slate-200 dark:border-slate-800 rounded-xl bg-white dark:bg-slate-900/50 p-6 [&_summary::-webkit-details-marker]:hidden transition-all duration-300">
+              <summary class="flex cursor-pointer items-center justify-between gap-1.5 text-slate-900 dark:text-white font-semibold text-lg select-none">
+                <span>When will I be asked to re-enter my API key?</span>
+                <span class="relative size-5 shrink-0">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="absolute inset-0 size-5 opacity-100 group-open:opacity-0 transition-opacity duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <svg xmlns="http://www.w3.org/2000/svg" class="absolute inset-0 size-5 opacity-0 group-open:opacity-100 transition-opacity duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </span>
+              </summary>
+              <p class="mt-4 leading-relaxed text-slate-600 dark:text-slate-400 text-base">
+                Your key will only clear if you run the site inside an Incognito / Private window (which drops LocalStorage on tab close), if you manually clear your browser cookies and site memory, or if you select the "Clear Key" button inside the Settings panel.
+              </p>
+            </details>
+          </div>
+
+          <!-- Category 3: Privacy & Security -->
+          <div class="space-y-4">
+            <h3 class="text-xl font-bold text-slate-900 dark:text-white border-b border-slate-200 dark:border-slate-800 pb-2">
+              Data Privacy & Document Security
+            </h3>
+
+            <details class="group border border-slate-200 dark:border-slate-800 rounded-xl bg-white dark:bg-slate-900/50 p-6 [&_summary::-webkit-details-marker]:hidden transition-all duration-300">
+              <summary class="flex cursor-pointer items-center justify-between gap-1.5 text-slate-900 dark:text-white font-semibold text-lg select-none">
+                <span>Is my API key safe? Can you see or steal my key?</span>
+                <span class="relative size-5 shrink-0">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="absolute inset-0 size-5 opacity-100 group-open:opacity-0 transition-opacity duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <svg xmlns="http://www.w3.org/2000/svg" class="absolute inset-0 size-5 opacity-0 group-open:opacity-100 transition-opacity duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </span>
+              </summary>
+              <p class="mt-4 leading-relaxed text-slate-600 dark:text-slate-400 text-base">
+                Your key is completely safe. Open Study Deck is a serverless, <strong>privacy first ai flashcard generator</strong>. We do not have database servers, logins, or trackers. Your key is stored in your private browser memory and queries Google’s APIs directly via encrypted HTTPS connections. We cannot see, access, or log your credentials.
+              </p>
+            </details>
+
+            <details class="group border border-slate-200 dark:border-slate-800 rounded-xl bg-white dark:bg-slate-900/50 p-6 [&_summary::-webkit-details-marker]:hidden transition-all duration-300">
+              <summary class="flex cursor-pointer items-center justify-between gap-1.5 text-slate-900 dark:text-white font-semibold text-lg select-none">
+                <span>What happens to the photos of my notes or textbooks?</span>
+                <span class="relative size-5 shrink-0">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="absolute inset-0 size-5 opacity-100 group-open:opacity-0 transition-opacity duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <svg xmlns="http://www.w3.org/2000/svg" class="absolute inset-0 size-5 opacity-0 group-open:opacity-100 transition-opacity duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </span>
+              </summary>
+              <p class="mt-4 leading-relaxed text-slate-600 dark:text-slate-400 text-base">
+                Your learning materials stay secure. Textbook screenshots and photos of lecture notes are processed locally in your browser viewport canvas. The image details are passed securely via HTTPS straight to Google to retrieve active summary text, and are never saved or cached on any external server.
+              </p>
+            </details>
+          </div>
+
+          <!-- Category 4: Limits & Visual Customization -->
+          <div class="space-y-4">
+            <h3 class="text-xl font-bold text-slate-900 dark:text-white border-b border-slate-200 dark:border-slate-800 pb-2">
+              Limits & Styling Customization
+            </h3>
+
+            <details class="group border border-slate-200 dark:border-slate-800 rounded-xl bg-white dark:bg-slate-900/50 p-6 [&_summary::-webkit-details-marker]:hidden transition-all duration-300">
+              <summary class="flex cursor-pointer items-center justify-between gap-1.5 text-slate-900 dark:text-white font-semibold text-lg select-none">
+                <span>Is there a daily limit to how many study cards I can make?</span>
+                <span class="relative size-5 shrink-0">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="absolute inset-0 size-5 opacity-100 group-open:opacity-0 transition-opacity duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <svg xmlns="http://www.w3.org/2000/svg" class="absolute inset-0 size-5 opacity-0 group-open:opacity-100 transition-opacity duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </span>
+              </summary>
+              <p class="mt-4 leading-relaxed text-slate-600 dark:text-slate-400 text-base">
+                No, you are free of SaaS restriction limits. Under Google’s free-tier Gemini API configuration, your key grants you up to 15 API requests per minute and 1,500 operations per day. This means you can <strong>scan notes to flashcards ai</strong> all day without ever running into credit blocks or subscription limits.
+              </p>
+            </details>
+
+            <details class="group border border-slate-200 dark:border-slate-800 rounded-xl bg-white dark:bg-slate-900/50 p-6 [&_summary::-webkit-details-marker]:hidden transition-all duration-300">
+              <summary class="flex cursor-pointer items-center justify-between gap-1.5 text-slate-900 dark:text-white font-semibold text-lg select-none">
+                <span>Can I save my study cards to my phone gallery?</span>
+                <span class="relative size-5 shrink-0">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="absolute inset-0 size-5 opacity-100 group-open:opacity-0 transition-opacity duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <svg xmlns="http://www.w3.org/2000/svg" class="absolute inset-0 size-5 opacity-0 group-open:opacity-100 transition-opacity duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </span>
+              </summary>
+              <p class="mt-4 leading-relaxed text-slate-600 dark:text-slate-400 text-base">
+                Yes. Our platform serves as a modern <strong>visual study card maker online</strong>. You can customize active theme highlights, backgrounds, and sizes on our workspace canvas. Once styled, use the export actions to <strong>convert image to study guide</strong> layouts and instantly <strong>export flashcards as PNG</strong> files directly to your mobile phone gallery or laptop storage.
+              </p>
+            </details>
+
+            <details class="group border border-slate-200 dark:border-slate-800 rounded-xl bg-white dark:bg-slate-900/50 p-6 [&_summary::-webkit-details-marker]:hidden transition-all duration-300">
+              <summary class="flex cursor-pointer items-center justify-between gap-1.5 text-slate-900 dark:text-white font-semibold text-lg select-none">
+                <span>This tool saved me hours of studying. How can I support it?</span>
+                <span class="relative size-5 shrink-0">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="absolute inset-0 size-5 opacity-100 group-open:opacity-0 transition-opacity duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <svg xmlns="http://www.w3.org/2000/svg" class="absolute inset-0 size-5 opacity-0 group-open:opacity-100 transition-opacity duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </span>
+              </summary>
+              <p class="mt-4 leading-relaxed text-slate-600 dark:text-slate-400 text-base">
+                Open Study Deck is a completely free, open-source project. If it has saved you study time, you can show your support by clicking the coffee donation trigger button inside the dashboard to treat the developer to a coffee, or share openstudydeck.com with your classmates!
+              </p>
+            </details>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="app-footer">
+      <div class="footer-inner">
+        <span>Open Study Deck • Privacy-First AI Card Studio</span>
+        <div style="display: flex; gap: var(--space-md); align-items: center; flex-wrap: wrap; justify-content: flex-end;">
+          <a href="about.html" class="scroll-top-link">About Us</a>
+          <a href="privacy.html" class="scroll-top-link">Privacy Policy</a>
+          <a href="terms.html" class="scroll-top-link">Terms & Conditions</a>
+          <a href="contact.html" class="scroll-top-link">Contact Us</a>
+          <a href="#faq-section" class="scroll-top-link">FAQ</a>
+          <a href="#home-section" class="scroll-top-link">Back to Top</a>
+        </div>
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- MODAL 1: CONFIGURE API KEY -->
+  <div class="modal-overlay" id="api-modal" style="display: none;">
+    <div class="modal-card api-card-highlight">
+      <button class="modal-close-btn" id="close-api-modal" aria-label="Close API Key configurations">&times;</button>
+      <h3 class="modal-title">Configure Gemini API Key</h3>
+      <p class="modal-desc">Paste your secret token here. It will be committed securely directly to your local browser storage.</p>
+      
+      <div class="api-status-badge" id="api-status-modal">
+        <span class="status-dot dot-red"></span>
+        <span class="status-text">Key Required</span>
+      </div>
+
+      <div class="input-with-icon">
+        <input type="password" id="api-key-input-modal" placeholder="AIzaSy..." autocomplete="off" aria-label="Google Gemini API Key">
+        <button class="icon-toggle-btn toggle-key-visibility-class" data-target-input="api-key-input-modal" type="button" title="Toggle Visibility">
+          <svg class="icon-eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+            <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+            <line x1="1" y1="1" x2="23" y2="23"></line>
+          </svg>
+        </button>
+      </div>
+
+      <div class="modal-api-actions">
+        <button class="btn btn-primary btn-save-key-class" data-source-input="api-key-input-modal">Save Key</button>
+        <button class="btn btn-secondary btn-clear-key-class">Clear Key</button>
+      </div>
+
+      <div class="instructions-accordion">
+        <p class="instruction-text"><strong>How to get a free key:</strong></p>
+        <ol class="instruction-list">
+          <li>Visit <a href="https://aistudio.google.com/" target="_blank" rel="noopener">Google AI Studio</a>.</li>
+          <li>Click <strong>"Get API Key"</strong>.</li>
+          <li>Select/create a project and copy the token.</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 2: SUPPORT THE CREATOR -->
+  <div class="modal-overlay" id="support-modal" style="display: none;">
+    <div class="modal-card">
+      <button class="modal-close-btn" id="close-support-modal" aria-label="Close support modal">&times;</button>
+      <h3 class="modal-title">Support the Creator</h3>
+      <p class="modal-desc">Select a contribution option. Your donation page will open on PayPal, and your optional message will prepare an email to the developer.</p>
+      
+      <div class="support-options-grid">
+        <label class="support-option-card" for="opt-coffee">
+          <input type="radio" name="support-tier" id="opt-coffee" value="5" checked>
+          <div class="support-option-content">
+            <span class="support-emoji">☕</span>
+            <span class="support-tier-name">Buy me a Coffee</span>
+            <span class="support-tier-price">$5 USD</span>
+          </div>
+        </label>
+        
+        <label class="support-option-card" for="opt-bun">
+          <input type="radio" name="support-tier" id="opt-bun" value="10">
+          <div class="support-option-content">
+            <span class="support-emoji">🥯</span>
+            <span class="support-tier-name">Buy me a Bun too</span>
+            <span class="support-tier-price">$10 USD</span>
+          </div>
+        </label>
+        
+        <label class="support-option-card" for="opt-platter">
+          <input type="radio" name="support-tier" id="opt-platter" value="15">
+          <div class="support-option-content">
+            <span class="support-emoji">🍽️</span>
+            <span class="support-tier-name">Buy me a Platter</span>
+            <span class="support-tier-price">$15 USD</span>
+          </div>
+        </label>
+        
+        <label class="support-option-card" for="opt-custom">
+          <input type="radio" name="support-tier" id="opt-custom" value="custom">
+          <div class="support-option-content">
+            <span class="support-emoji">⚙️</span>
+            <span class="support-tier-name">Custom Amount</span>
+            <span class="support-tier-price">Pay what you want</span>
+          </div>
+        </label>
+      </div>
+
+      <!-- Dedicated Custom Amount Form Group -->
+      <div class="form-group" id="custom-amount-group" style="display: none; margin-top: var(--space-xs);">
+        <label for="custom-support-amount" style="margin-bottom: var(--space-xxs); font-size: 12px; font-weight: 500; display: block; color: var(--text-ink);">Enter Custom Donation Amount (USD)</label>
+        <div class="input-with-currency">
+          <span class="currency-symbol">$</span>
+          <input type="number" id="custom-support-amount" placeholder="20" min="1" step="any" aria-label="Custom Donation Amount">
+        </div>
+      </div>
+
+      <div class="form-group" style="margin-top: var(--space-xs);">
+        <label for="support-message" style="margin-bottom: var(--space-xxs); font-size: 12px; font-weight: 500; display: block; color: var(--text-ink);">Custom Message (Optional)</label>
+        <textarea id="support-message" placeholder="Leave a feedback, feature request, or say thank you..."></textarea>
+      </div>
+
+      <button class="btn btn-primary" id="submit-support-btn">Support & Send Message</button>
+    </div>
+  </div>
+
+  <!-- Toast Notification System -->
+  <div class="toast-container" id="toast-container" aria-live="polite"></div>
+  
+  <!-- Client script modules -->
+  <script type="module" src="app.js"></script>
+</body>
+</html>

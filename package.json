@@ -1,17 +1,15 @@
 {
-  "name": "npm-create-astro-latest",
+  "name": "openstudydeck",
+  "private": true,
+  "version": "1.0.0",
   "type": "module",
-  "version": "0.0.1",
-  "engines": {
-    "node": ">=22.12.0"
-  },
   "scripts": {
-    "dev": "astro dev",
-    "build": "astro build",
-    "preview": "astro preview",
-    "astro": "astro"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "deploy": "npx wrangler pages deploy ./dist --project-name openstudydeck"
   },
-  "dependencies": {
-    "astro": "^6.4.4"
+  "devDependencies": {
+    "vite": "^5.0.0"
   }
 }

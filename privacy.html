@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-LTBKKM734X"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-LTBKKM734X');
+  </script>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Privacy Policy | Open Study Deck</title>
+  
+  <meta name="description" content="Read our privacy policy. Open Study Deck is a privacy-first, serverless AI study studio. Your files and API keys stay local.">
+  <link rel="canonical" href="https://openstudydeck.com/privacy.html">
+  <meta name="robots" content="index, follow">
+  
+  <!-- Fonts: Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="style.css">
+  
+  <!-- Favicon and Manifest -->
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="manifest" href="/site.webmanifest">
+  
+  <!-- Back to Top Button Component -->
+  <script type="module" src="back-to-top.js"></script>
+</head>
+<body>
+  <script>
+    if (localStorage.getItem('theme') === 'dark') {
+      document.body.classList.add('dark-mode');
+    }
+  </script>
+
+  <!-- FIXED TOP LEFT LOGO BRAND -->
+  <a href="index.html" class="fixed-header-logo show" id="fixed-logo" style="text-decoration: none;">
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M19 3H5C3.89543 3 3 3.89543 3 5V19C3 20.1046 3.89543 21 5 21H19C20.1046 21 21 20.1046 21 19V5C21 3.89543 20.1046 3 19 3Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+      <path d="M7 8H17" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      <path d="M7 12H17" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      <path d="M7 16H13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+    <span class="logo-name">Open Study Deck</span>
+  </a>
+
+  <!-- TOP RIGHT FLOATING UTILITIES -->
+  <div class="top-right-utilities">
+    <button class="utility-circle-btn" id="theme-toggle-btn" aria-label="Toggle Theme">
+      <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+        <circle cx="12" cy="12" r="5"></circle>
+        <line x1="12" y1="1" x2="12" y2="3"></line>
+        <line x1="12" y1="21" x2="12" y2="23"></line>
+        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+        <line x1="1" y1="12" x2="3" y2="12"></line>
+        <line x1="21" y1="12" x2="23" y2="12"></line>
+        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+      </svg>
+      <svg class="moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+      </svg>
+    </button>
+    <a href="index.html" class="utility-circle-btn" data-tooltip="Go Home" aria-label="Home" style="text-decoration: none;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+      </svg>
+    </a>
+  </div>
+
+  <!-- CONTENT WRAPPER -->
+  <div class="scroll-container">
+    <section class="scroll-page studio-page" style="padding-top: 100px;">
+      <div class="page-container" style="max-width: 800px; padding: 0 var(--space-md);">
+        
+        <header class="section-page-header">
+          <span class="page-eyebrow">Data Sovereignty</span>
+          <h2>Privacy Policy</h2>
+        </header>
+
+        <div class="workspace-card flex-col" style="gap: var(--space-md); padding: var(--space-xl); margin-bottom: var(--space-xl);">
+          <h3 class="settings-card-title">1. Introduction</h3>
+          <p class="settings-card-text">Welcome to Open Study Deck ("we", "our", "us"). We are committed to protecting your privacy. This Privacy Policy details how we handle information in our multi-page study studio. Unlike traditional software-as-a-service platforms, Open Study Deck is a serverless application built with a privacy-first, zero-database architecture.</p>
+
+          <hr class="card-divider">
+
+          <h3 class="settings-card-title">2. No Personal Data Collection</h3>
+          <p class="settings-card-text">We do not operate backend databases, nor do we run user signups or tracking accounts. We collect exactly <strong>zero</strong> personal identifiable information (PII). You do not need to register, log in, or input your email to access any of our study tools.</p>
+
+          <hr class="card-divider">
+
+          <h3 class="settings-card-title">3. API Key & Local Storage Security</h3>
+          <p class="settings-card-text">Open Study Deck operates fully under the <strong>Bring Your Own Key (BYOK)</strong> model. When you configure your Google Gemini API Key:</p>
+          <ul class="settings-card-text" style="list-style-type: disc; margin-left: var(--space-lg); space-y: var(--space-xs);">
+            <li>The key is saved locally inside your browser's client-side storage (<code>localStorage</code>).</li>
+            <li>The key is never transmitted to our servers or stored in any cloud database.</li>
+            <li>Your key is used exclusively to sign and authorize requests directly from your browser to the official Google Gemini API endpoints.</li>
+          </ul>
+
+          <hr class="card-divider">
+
+          <h3 class="settings-card-title">4. Local Files and Image Processing</h3>
+          <p class="settings-card-text">When you drag and drop notes, textbook screenshots, or photo documents to generate study guides:</p>
+          <ul class="settings-card-text" style="list-style-type: disc; margin-left: var(--space-lg); space-y: var(--space-xs);">
+            <li>Your source images and documents are processed locally inside your browser's viewport.</li>
+            <li>The files are sent over secure encrypted HTTPS connections directly to the Google Gemini API to run text extraction and analysis.</li>
+            <li>No files are uploaded or stored on our servers. Your study files never leave your client environment except to travel directly to Google.</li>
+          </ul>
+
+          <hr class="card-divider">
+
+          <h3 class="settings-card-title">5. Data Retention & Cleardown</h3>
+          <p class="settings-card-text">Your study decks and history are stored locally in your browser cache. You have absolute sovereignty over this data. You can completely erase your local decks, generated card summaries, and your saved API key at any time by clicking "Clear Key" or "Clear All Decks" in the Settings area of the landing dashboard.</p>
+
+          <hr class="card-divider">
+
+          <h3 class="settings-card-title">6. Third-Party Services</h3>
+          <p class="settings-card-text">Our application interfaces with the following third parties:</p>
+          <ul class="settings-card-text" style="list-style-type: disc; margin-left: var(--space-lg); space-y: var(--space-xs);">
+            <li><strong>Google Gemini API:</strong> Processes your uploaded content and keys to generate study decks. Their usage is governed by Google AI Studio Terms of Service.</li>
+            <li><strong>FormSubmit:</strong> Used on our Contact page to forward feedback emails to the developer.</li>
+          </ul>
+
+          <hr class="card-divider">
+
+          <h3 class="settings-card-title">7. Contact Us</h3>
+          <p class="settings-card-text">If you have any questions regarding this Privacy Policy or your data sovereignty, you can reach out via our contact portal or by emailing the developer directly at <strong>harukiwaves@zohomail.in</strong>.</p>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="app-footer">
+      <div class="footer-inner">
+        <span>Open Study Deck • Privacy-First AI Card Studio</span>
+        <div style="display: flex; gap: var(--space-md); align-items: center; flex-wrap: wrap; justify-content: flex-end;">
+          <a href="about.html" class="scroll-top-link">About Us</a>
+          <a href="privacy.html" class="scroll-top-link">Privacy Policy</a>
+          <a href="terms.html" class="scroll-top-link">Terms & Conditions</a>
+          <a href="contact.html" class="scroll-top-link">Contact Us</a>
+          <a href="index.html#faq-section" class="scroll-top-link">FAQ</a>
+          <a href="index.html" class="scroll-top-link">Home</a>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    const themeBtn = document.getElementById('theme-toggle-btn');
+    const sunIcon = themeBtn.querySelector('.sun-icon');
+    const moonIcon = themeBtn.querySelector('.moon-icon');
+
+    function updateIcons() {
+      const isDark = document.body.classList.contains('dark-mode');
+      if (isDark) {
+        sunIcon.style.display = 'block';
+        moonIcon.style.display = 'none';
+      } else {
+        sunIcon.style.display = 'none';
+        moonIcon.style.display = 'block';
+      }
+    }
+
+    updateIcons();
+
+    themeBtn.addEventListener('click', () => {
+      document.body.classList.toggle('dark-mode');
+      const isDark = document.body.classList.contains('dark-mode');
+      localStorage.setItem('theme', isDark ? 'dark' : 'light');
+      updateIcons();
+    });
+  </script>
+</body>
+</html>

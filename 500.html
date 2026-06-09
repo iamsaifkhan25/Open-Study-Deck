@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-LTBKKM734X"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-LTBKKM734X');
+  </script>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>System Error | Open Study Deck</title>
+  
+  <meta name="description" content="Something went wrong in the workspace. Rest assured, your API keys and local study decks are safe.">
+  <meta name="robots" content="noindex, follow">
+  
+  <!-- Fonts: Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="style.css">
+  
+  <!-- Favicon and Manifest -->
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="manifest" href="/site.webmanifest">
+  
+  <!-- Back to Top Button Component -->
+  <script type="module" src="back-to-top.js"></script>
+  
+  <style>
+    .error-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: var(--space-md);
+      padding: var(--space-2xl) var(--space-xl);
+    }
+    .error-code {
+      font-family: var(--font-mono);
+      font-size: 72px;
+      font-weight: 600;
+      background: linear-gradient(135deg, var(--ds-blue), var(--ds-red));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      line-height: 1;
+      margin-bottom: var(--space-xs);
+    }
+    .error-illustration {
+      margin-bottom: var(--space-sm);
+      color: var(--text-mute);
+    }
+  </style>
+</head>
+<body>
+  <script>
+    if (localStorage.getItem('theme') === 'dark') {
+      document.body.classList.add('dark-mode');
+    }
+  </script>
+
+  <!-- FIXED TOP LEFT LOGO BRAND -->
+  <a href="index.html" class="fixed-header-logo show" id="fixed-logo" style="text-decoration: none;">
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M19 3H5C3.89543 3 3 3.89543 3 5V19C3 20.1046 3.89543 21 5 21H19C20.1046 21 21 20.1046 21 19V5C21 3.89543 20.1046 3 19 3Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+      <path d="M7 8H17" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      <path d="M7 12H17" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      <path d="M7 16H13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+    <span class="logo-name">Open Study Deck</span>
+  </a>
+
+  <!-- TOP RIGHT FLOATING UTILITIES -->
+  <div class="top-right-utilities">
+    <button class="utility-circle-btn" id="theme-toggle-btn" aria-label="Toggle Theme">
+      <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+        <circle cx="12" cy="12" r="5"></circle>
+        <line x1="12" y1="1" x2="12" y2="3"></line>
+        <line x1="12" y1="21" x2="12" y2="23"></line>
+        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+        <line x1="1" y1="12" x2="3" y2="12"></line>
+        <line x1="21" y1="12" x2="23" y2="12"></line>
+        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+      </svg>
+      <svg class="moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+      </svg>
+    </button>
+    <a href="index.html" class="utility-circle-btn" data-tooltip="Go Home" aria-label="Home" style="text-decoration: none;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+      </svg>
+    </a>
+  </div>
+
+  <!-- CONTENT WRAPPER -->
+  <div class="scroll-container">
+    <section class="scroll-page studio-page" style="padding-top: 100px;">
+      <div class="page-container" style="max-width: 600px; padding: 0 var(--space-md);">
+        
+        <!-- Error Content Card -->
+        <div class="workspace-card flex-col error-container" style="margin-bottom: var(--space-xl);">
+          <div class="error-code">500</div>
+          
+          <div class="error-illustration">
+            <svg viewBox="0 0 24 24" width="64" height="64" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+              <line x1="12" y1="9" x2="12" y2="13"></line>
+              <line x1="12" y1="17" x2="12.01" y2="17"></line>
+            </svg>
+          </div>
+
+          <h3 class="settings-card-title">Workspace Crash</h3>
+          <p class="settings-card-text">Something went wrong inside our processing workstation. Rest assured, your API keys and local study decks are completely safe in your browser storage. Let's try reloading or heading back.</p>
+          
+          <div style="display: flex; gap: var(--space-md); width: 100%; margin-top: var(--space-sm); flex-wrap: wrap; justify-content: center;">
+            <button onclick="window.location.reload();" class="btn btn-primary" style="justify-content: center; min-width: 160px; height: 44px; cursor: pointer;">
+              <span>Reload Workspace</span>
+            </button>
+            <a href="index.html" class="btn btn-secondary" style="text-decoration: none; justify-content: center; min-width: 160px; height: 44px;">
+              <span>Return Home</span>
+            </a>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="app-footer">
+      <div class="footer-inner">
+        <span>Open Study Deck • Privacy-First AI Card Studio</span>
+        <div style="display: flex; gap: var(--space-md); align-items: center; flex-wrap: wrap; justify-content: flex-end;">
+          <a href="about.html" class="scroll-top-link">About Us</a>
+          <a href="privacy.html" class="scroll-top-link">Privacy Policy</a>
+          <a href="terms.html" class="scroll-top-link">Terms & Conditions</a>
+          <a href="contact.html" class="scroll-top-link">Contact Us</a>
+          <a href="index.html#faq-section" class="scroll-top-link">FAQ</a>
+          <a href="index.html" class="scroll-top-link">Home</a>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    const themeBtn = document.getElementById('theme-toggle-btn');
+    const sunIcon = themeBtn.querySelector('.sun-icon');
+    const moonIcon = themeBtn.querySelector('.moon-icon');
+
+    function updateIcons() {
+      const isDark = document.body.classList.contains('dark-mode');
+      if (isDark) {
+        sunIcon.style.display = 'block';
+        moonIcon.style.display = 'none';
+      } else {
+        sunIcon.style.display = 'none';
+        moonIcon.style.display = 'block';
+      }
+    }
+
+    updateIcons();
+
+    themeBtn.addEventListener('click', () => {
+      document.body.classList.toggle('dark-mode');
+      const isDark = document.body.classList.contains('dark-mode');
+      localStorage.setItem('theme', isDark ? 'dark' : 'light');
+      updateIcons();
+    });
+  </script>
+</body>
+</html>
