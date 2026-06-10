@@ -61,7 +61,10 @@ const DOM = {
   cardEmptyState: document.getElementById('card-empty-state'),
   cardLoadingState: document.getElementById('card-loading-state'),
   cardContentWrapper: document.getElementById('card-content-wrapper'),
-  toastContainer: document.getElementById('toast-container')
+  toastContainer: document.getElementById('toast-container'),
+  expandFullscreenBtn: document.getElementById('expand-fullscreen-btn'),
+  cardExpandOverlay: document.getElementById('card-expand-overlay'),
+  btnCardExpandClick: document.getElementById('btn-card-expand-click')
 };
 
 // --- Setup & Initialisation ---
@@ -312,6 +315,12 @@ function applyTheme(themeName) {
   // Reset themes classes on canvas
   DOM.cardCanvas.className = `card-canvas theme-${themeName}`;
   
+  // Also update theme on cloned canvas if full-screen modal is open
+  const cloneCanvas = document.getElementById('fullscreen-card-canvas');
+  if (cloneCanvas) {
+    cloneCanvas.className = `card-canvas theme-${themeName}`;
+  }
+  
   // Mark current active theme in menu dropdown
   document.querySelectorAll('.theme-option').forEach(btn => {
     if (btn.dataset.theme === themeName) {
@@ -453,7 +462,23 @@ function initEventListeners() {
   // 8. Export PNG
   DOM.exportPngBtn.addEventListener('click', handlePngExport);
   
-  // 9. History Drawer Clear All
+  // 9. Fullscreen views
+  DOM.expandFullscreenBtn.addEventListener('click', openFullscreenView);
+  DOM.btnCardExpandClick.addEventListener('click', openFullscreenView);
+  
+  // 10. Modals keyboard Escape behavior
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      const apiModal = document.getElementById('api-modal');
+      const supportModal = document.getElementById('support-modal');
+      const fullscreenModal = document.getElementById('fullscreen-modal');
+      if (apiModal) apiModal.style.display = 'none';
+      if (supportModal) supportModal.style.display = 'none';
+      if (fullscreenModal) fullscreenModal.style.display = 'none';
+    }
+  });
+  
+  // 11. History Drawer Clear All
   DOM.clearHistoryBtn.addEventListener('click', handleClearAllHistory);
 }
 
@@ -752,6 +777,7 @@ function setGenerationLoadingState(active) {
     DOM.cardLoadingState.style.display = 'block';
     
     DOM.exportPngBtn.disabled = true;
+    DOM.expandFullscreenBtn.disabled = true;
   } else {
     DOM.generateBtn.disabled = false;
     DOM.generateBtn.querySelector('span').textContent = 'Analyze & Generate';
@@ -766,6 +792,8 @@ function setEmptyState() {
   DOM.cardLoadingState.style.display = 'none';
   DOM.deckTitleDisplay.textContent = 'Untitled Study Deck';
   DOM.exportPngBtn.disabled = true;
+  DOM.expandFullscreenBtn.disabled = true;
+  DOM.studyCard.classList.remove('is-truncated');
   State.activeDeckId = null;
 }
 
@@ -1071,6 +1099,16 @@ function loadDeck(deckId) {
   DOM.cardLoadingState.style.display = 'none';
   DOM.cardContentWrapper.style.display = 'block';
   DOM.exportPngBtn.disabled = false;
+  DOM.expandFullscreenBtn.disabled = false;
+
+  // Clear any existing truncation first so we measure the natural scrollHeight
+  DOM.studyCard.classList.remove('is-truncated');
+  
+  // Use scrollHeight of cardContentWrapper to check if the generated content is large
+  const contentHeight = DOM.cardContentWrapper.scrollHeight;
+  if (contentHeight > 450) {
+    DOM.studyCard.classList.add('is-truncated');
+  }
 }
 
 function getModeLabel(mode) {
@@ -1103,18 +1141,11 @@ function handleClearAllHistory() {
   }
 }
 
-// --- html2canvas PNG export ---
-async function handlePngExport() {
-  const activeDeck = State.history.find(d => d.id === State.activeDeckId);
-  if (!activeDeck) {
-    showToast('No active deck to export.', 'warning');
-    return;
-  }
-  
+// --- Reusable PNG export helper ---
+async function exportElementToPng(targetElement, title, mode) {
   showToast('Exporting card as high-resolution PNG...', 'info');
-  DOM.exportPngBtn.disabled = true;
   
-  const flippedCards = DOM.cardCanvas.querySelectorAll('.flashcard-item.flipped');
+  const flippedCards = targetElement.querySelectorAll('.flashcard-item.flipped');
   flippedCards.forEach(c => c.classList.remove('flipped'));
   
   await new Promise(resolve => setTimeout(resolve, 300));
@@ -1128,20 +1159,24 @@ async function handlePngExport() {
     windowWidth: document.documentElement.offsetWidth,
     windowHeight: document.documentElement.offsetHeight,
     onclone: (clonedDoc) => {
-      const canvasClone = clonedDoc.getElementById('card-canvas');
+      const canvasClone = clonedDoc.querySelector('.card-canvas');
       if (canvasClone) {
         canvasClone.style.boxShadow = 'none';
+      }
+      const studyCardClone = clonedDoc.querySelector('.study-card');
+      if (studyCardClone) {
+        studyCardClone.classList.remove('is-truncated');
       }
     }
   };
   
   try {
-    const canvas = await window.html2canvas(DOM.cardCanvas, canvasConfig);
+    const canvas = await window.html2canvas(targetElement, canvasConfig);
     const dataUrl = canvas.toDataURL('image/png');
     
     const downloadLink = document.createElement('a');
-    const sanitizedTitle = activeDeck.title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-    downloadLink.download = `OpenStudyDeck-${sanitizedTitle}-${activeDeck.mode}.png`;
+    const sanitizedTitle = title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+    downloadLink.download = `OpenStudyDeck-${sanitizedTitle}-${mode}.png`;
     downloadLink.href = dataUrl;
     
     document.body.appendChild(downloadLink);
@@ -1153,15 +1188,130 @@ async function handlePngExport() {
     console.error('HTML2Canvas export failed:', err);
     showToast('Export failed. Please try again.', 'error');
   } finally {
-    DOM.exportPngBtn.disabled = false;
     flippedCards.forEach(c => c.classList.add('flipped'));
   }
+}
+
+// --- html2canvas PNG export ---
+async function handlePngExport() {
+  const activeDeck = State.history.find(d => d.id === State.activeDeckId);
+  if (!activeDeck) {
+    showToast('No active deck to export.', 'warning');
+    return;
+  }
+  
+  DOM.exportPngBtn.disabled = true;
+  try {
+    await exportElementToPng(DOM.cardCanvas, activeDeck.title, activeDeck.mode);
+  } finally {
+    DOM.exportPngBtn.disabled = false;
+  }
+}
+
+// --- Full Screen Modal PNG Export ---
+async function handleFullscreenPngExport() {
+  const activeDeck = State.history.find(d => d.id === State.activeDeckId);
+  if (!activeDeck) return;
+  const cloneCanvas = document.getElementById('fullscreen-card-canvas');
+  if (!cloneCanvas) return;
+  
+  const downloadBtn = document.getElementById('fullscreen-download-png');
+  downloadBtn.disabled = true;
+  try {
+    await exportElementToPng(cloneCanvas, activeDeck.title, activeDeck.mode);
+  } finally {
+    downloadBtn.disabled = false;
+  }
+}
+
+// --- Full Screen View Handler ---
+function openFullscreenView() {
+  const activeDeck = State.history.find(d => d.id === State.activeDeckId);
+  if (!activeDeck) return;
+  
+  const modal = document.getElementById('fullscreen-modal');
+  const container = document.getElementById('fullscreen-canvas-container');
+  if (!modal || !container) return;
+  
+  container.innerHTML = '';
+  
+  // Clone the canvas
+  const canvasClone = DOM.cardCanvas.cloneNode(true);
+  canvasClone.id = 'fullscreen-card-canvas';
+  
+  // Remove truncation class from study-card clone so it displays in full height
+  const studyCardClone = canvasClone.querySelector('.study-card');
+  if (studyCardClone) {
+    studyCardClone.classList.remove('is-truncated');
+  }
+  
+  // Re-attach card flip listeners on the clone
+  canvasClone.querySelectorAll('.flashcard-item').forEach(card => {
+    card.addEventListener('click', () => {
+      card.classList.toggle('flipped');
+    });
+  });
+  
+  container.appendChild(canvasClone);
+  modal.style.display = 'flex';
+}
+
+// --- Text Document (Markdown) Export ---
+function handleTextDownload() {
+  const activeDeck = State.history.find(d => d.id === State.activeDeckId);
+  if (!activeDeck) return;
+  
+  let mdText = `# ${activeDeck.title}\n`;
+  if (activeDeck.subtitle) {
+    mdText += `## ${activeDeck.subtitle}\n\n`;
+  }
+  
+  const modeLabel = getModeLabel(activeDeck.mode);
+  mdText += `Study Mode: ${modeLabel}\n`;
+  mdText += `Generated via Open Study Deck\n`;
+  mdText += `========================================\n\n`;
+  
+  const d = activeDeck.data;
+  if (activeDeck.mode === 'summary') {
+    d.bullets.forEach((b, idx) => {
+      mdText += `${idx + 1}. **${b.label}**: ${b.content}\n`;
+    });
+    mdText += `\n### Core Takeaway\n${d.takeaway}\n`;
+  } else if (activeDeck.mode === 'eli5') {
+    mdText += `### Analogy: ${d.analogyTitle}\n${d.analogy}\n\n`;
+    mdText += `### Simple Explanation\n${d.simpleExplanation}\n\n`;
+    mdText += `### Fun Fact\n${d.funFact}\n`;
+  } else if (activeDeck.mode === 'flashcards') {
+    d.cards.forEach((c, idx) => {
+      mdText += `Card ${idx + 1}\n`;
+      mdText += `Question: ${c.question}\n`;
+      mdText += `Answer: ${c.answer}\n`;
+      mdText += `----------------------------------------\n\n`;
+    });
+  }
+  
+  const blob = new Blob([mdText], { type: 'text/markdown;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  
+  const downloadLink = document.createElement('a');
+  const sanitizedTitle = activeDeck.title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+  downloadLink.download = `OpenStudyDeck-${sanitizedTitle}-${activeDeck.mode}.md`;
+  downloadLink.href = url;
+  
+  document.body.appendChild(downloadLink);
+  downloadLink.click();
+  document.body.removeChild(downloadLink);
+  URL.revokeObjectURL(url);
+  
+  showToast('Text Document exported successfully!', 'success');
 }
 
 // --- Modal Handlers ---
 function initModalHandlers() {
   const apiModal = document.getElementById('api-modal');
   const supportModal = document.getElementById('support-modal');
+  const fullscreenModal = document.getElementById('fullscreen-modal');
+  const closeFullscreenModal = document.getElementById('close-fullscreen-modal');
   
   // Open Triggers
   document.getElementById('api-modal-trigger').addEventListener('click', () => {
@@ -1195,8 +1345,14 @@ function initModalHandlers() {
     supportModal.style.display = 'none';
   });
   
+  if (closeFullscreenModal) {
+    closeFullscreenModal.addEventListener('click', () => {
+      fullscreenModal.style.display = 'none';
+    });
+  }
+  
   // Click overlay to close
-  [apiModal, supportModal].forEach(modal => {
+  [apiModal, supportModal, fullscreenModal].forEach(modal => {
     if (modal) {
       modal.addEventListener('click', (e) => {
         if (e.target === modal) {
@@ -1205,6 +1361,16 @@ function initModalHandlers() {
       });
     }
   });
+
+  const fullscreenDownloadPng = document.getElementById('fullscreen-download-png');
+  if (fullscreenDownloadPng) {
+    fullscreenDownloadPng.addEventListener('click', handleFullscreenPngExport);
+  }
+  
+  const fullscreenDownloadText = document.getElementById('fullscreen-download-text');
+  if (fullscreenDownloadText) {
+    fullscreenDownloadText.addEventListener('click', handleTextDownload);
+  }
 }
 
 // --- Support Donation Tiers Form Handler ---

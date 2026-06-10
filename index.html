@@ -403,6 +403,13 @@
                     <line x1="12" y1="15" x2="12" y2="3"></line>
                   </svg>
                 </button>
+
+                <!-- Expand card -->
+                <button class="btn btn-secondary-sm toolbar-btn" id="expand-fullscreen-btn" disabled data-tooltip="View Full Screen">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+                    <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"></path>
+                  </svg>
+                </button>
               </div>
             </div>
 
@@ -452,6 +459,16 @@
 
                   <!-- Injected outputs -->
                   <div class="card-content-wrapper" id="card-content-wrapper" style="display: none;"></div>
+
+                  <!-- Expand overlay (visible when study-card is truncated due to large size) -->
+                  <div class="study-card-expand-overlay" id="card-expand-overlay">
+                    <button type="button" class="btn-card-expand" id="btn-card-expand-click">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="12" height="12">
+                        <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"></path>
+                      </svg>
+                      <span>Expand to Full Screen</span>
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1015,6 +1032,43 @@
       </div>
 
       <button class="btn btn-primary" id="submit-support-btn">Support & Send Message</button>
+    </div>
+  </div>
+
+  <!-- MODAL 3: FULL SCREEN CARD VIEW & DOWNLOAD -->
+  <div class="modal-overlay fullscreen-modal-overlay" id="fullscreen-modal" style="display: none;">
+    <div class="fullscreen-modal-card">
+      <button class="modal-close-btn" id="close-fullscreen-modal" aria-label="Close full screen view">&times;</button>
+      
+      <div class="fullscreen-modal-header">
+        <h3 class="modal-title">Full Screen View</h3>
+        <p class="modal-desc">Interact with your study material in full viewport size and export it.</p>
+      </div>
+      
+      <div class="fullscreen-modal-body">
+        <div class="fullscreen-canvas-container" id="fullscreen-canvas-container">
+          <!-- Cloned card-canvas inside -->
+        </div>
+      </div>
+      
+      <div class="fullscreen-modal-footer">
+        <div class="fullscreen-actions">
+          <button class="btn btn-primary" id="fullscreen-download-png">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            <span>Download PNG Image</span>
+          </button>
+          <button class="btn btn-secondary" id="fullscreen-download-text">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+              <path d="M12 17V3m0 14l-4-4m4 4l4-4m-7 4h6"></path>
+            </svg>
+            <span>Download Text / Markdown</span>
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 
