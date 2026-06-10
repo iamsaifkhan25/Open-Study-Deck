@@ -4,6 +4,12 @@ A privacy-first, zero-paywall AI study card studio for students. It takes upload
 
 ---
 
+## 💡 Why was it built?
+
+Built after noticing students manually creating study notes with AI tools. Open Study Deck aims to provide a free, privacy-first alternative that uses a Bring Your Own Key (BYOK) model.
+
+---
+
 ## 🚀 Key Features & disruptions
 
 1.  **Bring Your Own Key (BYOK):** Bypasses SaaS subscription paywalls by letting you use your own local Google Gemini API key. All generations are direct and free.
@@ -28,6 +34,12 @@ A privacy-first, zero-paywall AI study card studio for students. It takes upload
 *   **AI Engine:** Official Google GenAI SDK (`@google/genai`) imported directly from CDN.
 *   **Export Pipeline:** `html2canvas-pro` for rendering CSS box models and complex borders.
 *   **Storage:** HTML5 LocalStorage.
+
+---
+
+## 🌐 Live Demo
+
+Live Site: [https://openstudydeck.com](https://openstudydeck.com)
 
 ---
 
@@ -59,13 +71,6 @@ Open Study Deck is committed to absolute data privacy:
 *   Your API key is only stored in your browser's `localStorage`.
 *   Image analysis and text processing calls are made directly from your browser to Google Gemini API servers. No third-party servers intercept your data.
 *   PNG exports are rendered programmatically inside your browser DOM (client-side canvas screenshotting).
-
----
-
-## ☕ Support the Creator
-
-If you love this tool and want to support the project, feel free to buy me a coffee!
-*   **PayPal:** [Support via PayPal](https://paypal.me/sachinchaurasiya)
 
 ---
 
