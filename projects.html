@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-LTBKKM734X"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-LTBKKM734X');
+  </script>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Other Projects | Open Study Deck</title>
+  
+  <meta name="description" content="Discover utility tools and apps developed by independent developer Saif Khan. Support ongoing development and get previews of upcoming projects.">
+  <link rel="canonical" href="https://openstudydeck.com/projects.html">
+  <meta name="robots" content="index, follow">
+  
+  <!-- Fonts: Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="style.css">
+  
+  <!-- Favicon and Manifest -->
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="manifest" href="/site.webmanifest">
+  
+  <!-- Back to Top Button Component -->
+  <script type="module" src="back-to-top.js"></script>
+
+  <style>
+    .launch-soon-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-2xl) var(--space-xl);
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px dashed rgba(0, 0, 0, 0.1);
+      border-radius: var(--radius-lg);
+      text-align: center;
+      margin-bottom: var(--space-xl);
+      position: relative;
+      overflow: hidden;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+    body.dark-mode .launch-soon-card {
+      background: rgba(255, 255, 255, 0.01);
+      border-color: rgba(255, 255, 255, 0.08);
+    }
+    .launch-soon-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-xs);
+      padding: 8px 18px;
+      background: linear-gradient(135deg, rgba(14, 165, 233, 0.12), rgba(236, 72, 153, 0.12));
+      border: 1px solid rgba(14, 165, 233, 0.25);
+      border-radius: 50px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--ds-blue);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: var(--space-md);
+      animation: pulse-border 2.5s infinite ease-in-out;
+    }
+    .pulse-dot {
+      width: 8px;
+      height: 8px;
+      background-color: var(--ds-blue);
+      border-radius: 50%;
+      display: inline-block;
+      position: relative;
+    }
+    .pulse-dot::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background-color: inherit;
+      animation: pulse-ring 1.5s infinite ease-in-out;
+    }
+    @keyframes pulse-ring {
+      0% { transform: scale(1); opacity: 0.8; }
+      100% { transform: scale(2.5); opacity: 0; }
+    }
+    @keyframes pulse-border {
+      0%, 100% { border-color: rgba(14, 165, 233, 0.25); }
+      50% { border-color: rgba(236, 72, 153, 0.45); }
+    }
+  </style>
+</head>
+<body>
+  <script>
+    if (localStorage.getItem('theme') === 'dark') {
+      document.body.classList.add('dark-mode');
+    }
+  </script>
+
+  <!-- FIXED TOP LEFT LOGO BRAND -->
+  <a href="index.html" class="fixed-header-logo show" id="fixed-logo" style="text-decoration: none;">
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M19 3H5C3.89543 3 3 3.89543 3 5V19C3 20.1046 3.89543 21 5 21H19C20.1046 21 21 20.1046 21 19V5C21 3.89543 20.1046 3 19 3Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+      <path d="M7 8H17" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      <path d="M7 12H17" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      <path d="M7 16H13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+    <span class="logo-name">Open Study Deck</span>
+  </a>
+
+  <!-- TOP RIGHT FLOATING UTILITIES -->
+  <div class="top-right-utilities">
+    <button class="utility-circle-btn" id="theme-toggle-btn" aria-label="Toggle Theme">
+      <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+        <circle cx="12" cy="12" r="5"></circle>
+        <line x1="12" y1="1" x2="12" y2="3"></line>
+        <line x1="12" y1="21" x2="12" y2="23"></line>
+        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+        <line x1="1" y1="12" x2="3" y2="12"></line>
+        <line x1="21" y1="12" x2="23" y2="12"></line>
+        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+      </svg>
+      <svg class="moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+      </svg>
+    </button>
+    <a href="index.html" class="utility-circle-btn" data-tooltip="Go Home" aria-label="Home" style="text-decoration: none;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+      </svg>
+    </a>
+  </div>
+
+  <!-- CONTENT WRAPPER -->
+  <div class="scroll-container">
+    <section class="scroll-page studio-page" style="padding-top: 100px;">
+      <div class="page-container" style="max-width: 800px; padding: 0 var(--space-md);">
+        
+        <header class="section-page-header">
+          <span class="page-eyebrow">Ecosystem Hub</span>
+          <h1>Other Projects</h1>
+        </header>
+
+        <div class="workspace-card flex-col" style="gap: var(--space-md); padding: var(--space-xl); margin-bottom: var(--space-xl);">
+          
+          <div class="launch-soon-card">
+            <div class="launch-soon-badge">
+              <span class="pulse-dot"></span>
+              Launching Soon
+            </div>
+            <h2 class="settings-card-title" style="margin-bottom: var(--space-xs);">Project Hub & Connected Tools</h2>
+            <p class="settings-card-text" style="max-width: 500px; margin: 0 auto;">Our connected developer suite is currently being optimized and is getting ready to showcase exciting utilities.</p>
+          </div>
+
+          <h3 class="settings-card-title">Utility Ecosystem</h3>
+          <p class="settings-card-text">As an independent developer, I will be developing many utility tools and listing them under each other so that they are connected. This unified platform will allow you to access a rich array of serverless, privacy-first applications that make learning, organizing, and developing much smoother. In addition to these lightweight web utilities, I will also try to create a native app to expand the bounds of these productivity features.</p>
+          
+          <p class="settings-card-text">Maintaining this infrastructure and continuously releasing open-source, zero-paywall software takes resources. As an independent developer, I will need support to keep these tools completely free, clean, and ad-free. If you find these platforms helpful, you can help me with a donation using the form below.</p>
+
+          <hr class="card-divider">
+
+          <h3 class="settings-card-title">Support the Developer</h3>
+          <p class="settings-card-text" style="margin-bottom: var(--space-sm);">Choose a support tier. When submitting, your contribution will open securely via PayPal, and any optional message you provide will compile into a direct mail template to the developer.</p>
+
+          <div class="support-options-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: var(--space-sm); margin-bottom: var(--space-md);">
+            <label class="support-option-card" for="opt-coffee">
+              <input type="radio" name="support-tier" id="opt-coffee" value="5" checked>
+              <div class="support-option-content">
+                <span class="support-emoji">☕</span>
+                <span class="support-tier-name">Buy me a Coffee</span>
+                <span class="support-tier-price">$5 USD</span>
+              </div>
+            </label>
+            
+            <label class="support-option-card" for="opt-bun">
+              <input type="radio" name="support-tier" id="opt-bun" value="10">
+              <div class="support-option-content">
+                <span class="support-emoji">🥯</span>
+                <span class="support-tier-name">Buy me a Bun too</span>
+                <span class="support-tier-price">$10 USD</span>
+              </div>
+            </label>
+            
+            <label class="support-option-card" for="opt-platter">
+              <input type="radio" name="support-tier" id="opt-platter" value="15">
+              <div class="support-option-content">
+                <span class="support-emoji">🍽️</span>
+                <span class="support-tier-name">Buy me a Platter</span>
+                <span class="support-tier-price">$15 USD</span>
+              </div>
+            </label>
+            
+            <label class="support-option-card" for="opt-custom">
+              <input type="radio" name="support-tier" id="opt-custom" value="custom">
+              <div class="support-option-content">
+                <span class="support-emoji">⚙️</span>
+                <span class="support-tier-name">Custom Amount</span>
+                <span class="support-tier-price">Pay what you want</span>
+              </div>
+            </label>
+          </div>
+
+          <!-- Custom Amount Input -->
+          <div class="form-group" id="custom-amount-group" style="display: none; margin-bottom: var(--space-md);">
+            <label for="custom-support-amount" style="margin-bottom: var(--space-xxs); font-size: 12px; font-weight: 500; display: block; color: var(--text-ink);">Enter Custom Donation Amount (USD)</label>
+            <div class="input-with-currency" style="position: relative; display: flex; align-items: center;">
+              <span class="currency-symbol" style="position: absolute; left: var(--space-xs); font-weight: 600; color: var(--text-mute); font-size: 14px;">$</span>
+              <input type="number" id="custom-support-amount" placeholder="20" min="1" step="any" aria-label="Custom Donation Amount" style="padding-left: 24px; width: 100%; height: 42px; border-radius: var(--radius-sm); border: 2px solid rgba(0,0,0,0.08); background: var(--bg-card); color: var(--text-ink); outline: none;">
+            </div>
+          </div>
+
+          <!-- Custom Message -->
+          <div class="form-group" style="margin-bottom: var(--space-md);">
+            <label for="support-message" style="margin-bottom: var(--space-xxs); font-size: 12px; font-weight: 500; display: block; color: var(--text-ink);">Custom Message (Optional)</label>
+            <textarea id="support-message" placeholder="Leave feedback, suggest a feature, or say hello..." style="width: 100%; min-height: 100px; border-radius: var(--radius-sm); border: 2px solid rgba(0,0,0,0.08); padding: var(--space-xs); background: var(--bg-card); color: var(--text-ink); resize: vertical; outline: none; font-family: inherit; font-size: 14px;"></textarea>
+          </div>
+
+          <button class="btn btn-primary" id="submit-support-btn" style="width: 100%; justify-content: center; height: 46px;">
+            <span>Support & Send Message</span>
+          </button>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="app-footer">
+      <div class="footer-inner">
+        <span>Open Study Deck • Privacy-First AI Card Studio</span>
+        <div style="display: flex; gap: var(--space-md); align-items: center; flex-wrap: wrap; justify-content: flex-end;">
+          <a href="about.html" class="scroll-top-link">About Us</a>
+          <a href="projects.html" class="scroll-top-link">Other Projects</a>
+          <a href="privacy.html" class="scroll-top-link">Privacy Policy</a>
+          <a href="terms.html" class="scroll-top-link">Terms & Conditions</a>
+          <a href="contact.html" class="scroll-top-link">Contact Us</a>
+          <a href="index.html#faq-section" class="scroll-top-link">FAQ</a>
+          <a href="index.html" class="scroll-top-link">Home</a>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    // Theme setup and toggle
+    const themeBtn = document.getElementById('theme-toggle-btn');
+    const sunIcon = themeBtn.querySelector('.sun-icon');
+    const moonIcon = themeBtn.querySelector('.moon-icon');
+
+    function updateIcons() {
+      const isDark = document.body.classList.contains('dark-mode');
+      if (isDark) {
+        sunIcon.style.display = 'block';
+        moonIcon.style.display = 'none';
+      } else {
+        sunIcon.style.display = 'none';
+        moonIcon.style.display = 'block';
+      }
+    }
+
+    updateIcons();
+
+    themeBtn.addEventListener('click', () => {
+      document.body.classList.toggle('dark-mode');
+      const isDark = document.body.classList.contains('dark-mode');
+      localStorage.setItem('theme', isDark ? 'dark' : 'light');
+      updateIcons();
+    });
+
+    // Donation Form Handlers
+    const customRadio = document.getElementById('opt-custom');
+    const customInput = document.getElementById('custom-support-amount');
+    const allRadios = document.querySelectorAll('input[name="support-tier"]');
+    const submitBtn = document.getElementById('submit-support-btn');
+    const messageArea = document.getElementById('support-message');
+    const customAmountGroup = document.getElementById('custom-amount-group');
+
+    allRadios.forEach(radio => {
+      radio.addEventListener('change', () => {
+        if (customRadio.checked) {
+          customAmountGroup.style.display = 'block';
+          if (!customInput.value) {
+            customInput.value = '20';
+          }
+          customInput.focus();
+          customInput.select();
+        } else {
+          customAmountGroup.style.display = 'none';
+          customInput.value = '';
+        }
+      });
+    });
+
+    submitBtn.addEventListener('click', () => {
+      let amount = 0;
+      if (customRadio.checked) {
+        amount = parseFloat(customInput.value.trim());
+        if (isNaN(amount) || amount <= 0) {
+          alert('Please enter a valid donation amount (e.g. 5, 20).');
+          customInput.focus();
+          return;
+        }
+      } else {
+        const selectedRadio = document.querySelector('input[name="support-tier"]:checked');
+        amount = parseFloat(selectedRadio.value);
+      }
+      
+      const message = messageArea.value.trim();
+      const payPalUrl = `https://paypal.me/iamsaifkhan25/${amount}`;
+      
+      // 1. Open Paypal Payment portal in a new tab
+      window.open(payPalUrl, '_blank');
+      
+      // 2. Dispatch message as client-side mailto link to the developer
+      if (message) {
+        setTimeout(() => {
+          const mailtoSubject = `Support Message for Open Study Deck ($${amount})`;
+          const mailtoBody = `Hi! I have contributed $${amount} USD via PayPal to support your work.\n\nMessage:\n${message}`;
+          const mailtoUrl = `mailto:harukiwaves@zohomail.in?subject=${encodeURIComponent(mailtoSubject)}&body=${encodeURIComponent(mailtoBody)}`;
+          window.location.href = mailtoUrl;
+        }, 1000);
+      }
+    });
+  </script>
+</body>
+</html>
