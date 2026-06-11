@@ -1466,7 +1466,7 @@ function initSupportHandlers() {
       }
 
       const options = {
-        key: 'rzp_live_T0Nw1fEYYo8OtR',
+        key: orderData.razorpayKeyId,
         amount: orderData.amount,
         currency: orderData.currency,
         name: 'Open Study Deck',

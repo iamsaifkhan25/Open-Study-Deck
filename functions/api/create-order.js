@@ -9,8 +9,16 @@ export async function onRequestPost(context) {
       });
     }
 
-    const keyId = 'rzp_live_T0Nw1fEYYo8OtR';
-    const keySecret = '50xAouMgBbV92KqiR5KaG57R';
+    const keyId = context.env.RAZORPAY_KEY_ID;
+    const keySecret = context.env.RAZORPAY_KEY_SECRET;
+
+    if (!keyId || !keySecret) {
+      return new Response(JSON.stringify({ error: 'Razorpay API keys are not configured in environment variables' }), {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
     const authHeader = 'Basic ' + btoa(`${keyId}:${keySecret}`);
 
     const response = await fetch('https://api.razorpay.com/v1/orders', {
@@ -27,6 +35,10 @@ export async function onRequestPost(context) {
     });
 
     const data = await response.json();
+    
+    if (data && !data.error) {
+      data.razorpayKeyId = keyId;
+    }
 
     return new Response(JSON.stringify(data), {
       status: response.status,

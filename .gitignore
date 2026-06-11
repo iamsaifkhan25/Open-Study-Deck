@@ -5,3 +5,7 @@ dist/
 .vscode/
 package-lock.json
 *.log
+.env
+.env.local
+.env.*.local
+.dev.vars
