@@ -175,7 +175,7 @@
           <hr class="card-divider">
 
           <h3 class="settings-card-title">Support the Developer</h3>
-          <p class="settings-card-text" style="margin-bottom: var(--space-sm);">Choose a support tier. When submitting, your contribution will open securely via PayPal, and any optional message you provide will compile into a direct mail template to the developer.</p>
+          <p class="settings-card-text" style="margin-bottom: var(--space-sm);">Choose a support tier. When submitting, your contribution will process securely via Razorpay, and any optional message you provide will compile into a direct mail template to the developer.</p>
 
           <div class="support-options-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: var(--space-sm); margin-bottom: var(--space-md);">
             <label class="support-option-card" for="opt-coffee">
@@ -281,6 +281,21 @@
       updateIcons();
     });
 
+    // Load Razorpay Script Dynamically
+    const loadRazorpay = () => {
+      return new Promise((resolve) => {
+        if (window.Razorpay) {
+          resolve(true);
+          return;
+        }
+        const script = document.createElement('script');
+        script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+        script.onload = () => resolve(true);
+        script.onerror = () => resolve(false);
+        document.body.appendChild(script);
+      });
+    };
+
     // Donation Form Handlers
     const customRadio = document.getElementById('opt-custom');
     const customInput = document.getElementById('custom-support-amount');
@@ -305,7 +320,7 @@
       });
     });
 
-    submitBtn.addEventListener('click', () => {
+    submitBtn.addEventListener('click', async () => {
       let amount = 0;
       if (customRadio.checked) {
         amount = parseFloat(customInput.value.trim());
@@ -320,19 +335,92 @@
       }
       
       const message = messageArea.value.trim();
-      const payPalUrl = `https://paypal.me/iamsaifkhan25/${amount}`;
       
-      // 1. Open Paypal Payment portal in a new tab
-      window.open(payPalUrl, '_blank');
-      
-      // 2. Dispatch message as client-side mailto link to the developer
-      if (message) {
-        setTimeout(() => {
-          const mailtoSubject = `Support Message for Open Study Deck ($${amount})`;
-          const mailtoBody = `Hi! I have contributed $${amount} USD via PayPal to support your work.\n\nMessage:\n${message}`;
-          const mailtoUrl = `mailto:harukiwaves@zohomail.in?subject=${encodeURIComponent(mailtoSubject)}&body=${encodeURIComponent(mailtoBody)}`;
-          window.location.href = mailtoUrl;
-        }, 1000);
+      const originalText = submitBtn.innerText;
+      submitBtn.disabled = true;
+      submitBtn.innerText = 'Initializing...';
+
+      try {
+        const isLoaded = await loadRazorpay();
+        if (!isLoaded) {
+          alert('Failed to load Razorpay payment gateway. Please check your internet connection.');
+          submitBtn.disabled = false;
+          submitBtn.innerText = originalText;
+          return;
+        }
+
+        const centsAmount = Math.round(amount * 100);
+        const orderRes = await fetch('/api/create-order', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            amount: centsAmount,
+            currency: 'USD'
+          })
+        });
+
+        if (!orderRes.ok) {
+          throw new Error('Failed to initiate order');
+        }
+
+        const orderData = await orderRes.json();
+        if (orderData.error) {
+          throw new Error(orderData.error);
+        }
+
+        const options = {
+          key: 'rzp_live_T0Nw1fEYYo8OtR',
+          amount: orderData.amount,
+          currency: orderData.currency,
+          name: 'Open Study Deck',
+          description: 'Support the Creator',
+          order_id: orderData.id,
+          handler: function (response) {
+            alert(`Thank you! Payment of $${amount} USD processed successfully.`);
+            
+            if (message) {
+              setTimeout(() => {
+                const mailtoSubject = `Support Message for Open Study Deck ($${amount})`;
+                const mailtoBody = `Hi! I have contributed $${amount} USD via Razorpay to support your work.\n\nMessage:\n${message}\n\nPayment ID: ${response.razorpay_payment_id}`;
+                const mailtoUrl = `mailto:harukiwaves@zohomail.in?subject=${encodeURIComponent(mailtoSubject)}&body=${encodeURIComponent(mailtoBody)}`;
+                window.location.href = mailtoUrl;
+              }, 1000);
+            }
+
+            // Reset states
+            messageArea.value = '';
+            customInput.value = '';
+            customAmountGroup.style.display = 'none';
+            document.getElementById('opt-coffee').checked = true;
+            submitBtn.disabled = false;
+            submitBtn.innerText = originalText;
+          },
+          prefill: {
+            name: '',
+            email: '',
+            contact: ''
+          },
+          theme: {
+            color: '#18181b'
+          },
+          modal: {
+            ondismiss: function () {
+              submitBtn.disabled = false;
+              submitBtn.innerText = originalText;
+            }
+          }
+        };
+
+        const rzp = new window.Razorpay(options);
+        rzp.open();
+        submitBtn.innerText = 'In Progress...';
+      } catch (err) {
+        console.error(err);
+        alert('Payment initialization failed. Please try again.');
+        submitBtn.disabled = false;
+        submitBtn.innerText = originalText;
       }
     });
   </script>

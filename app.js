@@ -1373,6 +1373,21 @@ function initModalHandlers() {
   }
 }
 
+// --- Load Razorpay Script Dynamically ---
+const loadRazorpay = () => {
+  return new Promise((resolve) => {
+    if (window.Razorpay) {
+      resolve(true);
+      return;
+    }
+    const script = document.createElement('script');
+    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+    script.onload = () => resolve(true);
+    script.onerror = () => resolve(false);
+    document.body.appendChild(script);
+  });
+};
+
 // --- Support Donation Tiers Form Handler ---
 function initSupportHandlers() {
   const customRadio = document.getElementById('opt-custom');
@@ -1399,7 +1414,7 @@ function initSupportHandlers() {
     });
   });
   
-  submitBtn.addEventListener('click', () => {
+  submitBtn.addEventListener('click', async () => {
     let amount = 0;
     
     if (customRadio.checked) {
@@ -1415,28 +1430,94 @@ function initSupportHandlers() {
     }
     
     const message = messageArea.value.trim();
-    const payPalUrl = `https://paypal.me/iamsaifkhan25/${amount}`;
     
-    // 1. Open Paypal Payment portal in a new tab
-    window.open(payPalUrl, '_blank');
-    showToast(`Redirecting to PayPal for $${amount} USD donation...`, 'success', 3000);
-    
-    // 2. Dispatch message as client-side mailto link to the developer
-    if (message) {
-      setTimeout(() => {
-        const mailtoSubject = `Support Message for Open Study Deck ($${amount})`;
-        const mailtoBody = `Hi! I have contributed $${amount} USD via PayPal to support Open Study Deck.\n\nMessage:\n${message}`;
-        const mailtoUrl = `mailto:harukiwaves@zohomail.in?subject=${encodeURIComponent(mailtoSubject)}&body=${encodeURIComponent(mailtoBody)}`;
-        window.location.href = mailtoUrl;
-      }, 1000);
+    const originalText = submitBtn.innerText;
+    submitBtn.disabled = true;
+    submitBtn.innerText = 'Initializing...';
+
+    try {
+      const isLoaded = await loadRazorpay();
+      if (!isLoaded) {
+        showToast('Failed to load Razorpay payment gateway. Please check your internet connection.', 'error');
+        submitBtn.disabled = false;
+        submitBtn.innerText = originalText;
+        return;
+      }
+
+      const centsAmount = Math.round(amount * 100);
+      const orderRes = await fetch('/api/create-order', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          amount: centsAmount,
+          currency: 'USD'
+        })
+      });
+
+      if (!orderRes.ok) {
+        throw new Error('Failed to initiate order');
+      }
+
+      const orderData = await orderRes.json();
+      if (orderData.error) {
+        throw new Error(orderData.error);
+      }
+
+      const options = {
+        key: 'rzp_live_T0Nw1fEYYo8OtR',
+        amount: orderData.amount,
+        currency: orderData.currency,
+        name: 'Open Study Deck',
+        description: 'Support the Creator',
+        order_id: orderData.id,
+        handler: function (response) {
+          showToast(`Thank you! Payment of $${amount} USD processed successfully.`, 'success', 5000);
+          
+          if (message) {
+            setTimeout(() => {
+              const mailtoSubject = `Support Message for Open Study Deck ($${amount})`;
+              const mailtoBody = `Hi! I have contributed $${amount} USD via Razorpay to support Open Study Deck.\n\nMessage:\n${message}\n\nPayment ID: ${response.razorpay_payment_id}`;
+              const mailtoUrl = `mailto:harukiwaves@zohomail.in?subject=${encodeURIComponent(mailtoSubject)}&body=${encodeURIComponent(mailtoBody)}`;
+              window.location.href = mailtoUrl;
+            }, 1000);
+          }
+
+          // Reset form states
+          document.getElementById('support-modal').style.display = 'none';
+          messageArea.value = '';
+          customInput.value = '';
+          if (customAmountGroup) customAmountGroup.style.display = 'none';
+          document.getElementById('opt-coffee').checked = true;
+          submitBtn.disabled = false;
+          submitBtn.innerText = originalText;
+        },
+        prefill: {
+          name: '',
+          email: '',
+          contact: ''
+        },
+        theme: {
+          color: '#18181b'
+        },
+        modal: {
+          ondismiss: function () {
+            submitBtn.disabled = false;
+            submitBtn.innerText = originalText;
+          }
+        }
+      };
+
+      const rzp = new window.Razorpay(options);
+      rzp.open();
+      submitBtn.innerText = 'In Progress...';
+    } catch (err) {
+      console.error(err);
+      showToast('Payment initialization failed. Please try again.', 'error');
+      submitBtn.disabled = false;
+      submitBtn.innerText = originalText;
     }
-    
-    // 3. Reset form states
-    document.getElementById('support-modal').style.display = 'none';
-    messageArea.value = '';
-    customInput.value = '';
-    if (customAmountGroup) customAmountGroup.style.display = 'none';
-    document.getElementById('opt-coffee').checked = true;
   });
 }
 
