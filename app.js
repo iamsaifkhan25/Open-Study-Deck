@@ -10,8 +10,7 @@ const State = {
   activeTab: 'image', // 'image' | 'text'
   uploadedImageBase64: null,
   uploadedImageMimeType: null,
-  uploadedImageFileName: null,
-  selectedMode: 'summary', // 'summary' | 'eli5' | 'flashcards'
+  selectedMode: 'summary', // 'summary' | 'eli5' | 'notes' | 'flashcards'
   selectedTheme: 'aura-mesh', // 'aura-mesh' | 'cyber-midnight' | 'sunset-glow' | 'minimal-grid'
   selectedModel: 'gemini-2.5-flash',
   focusSubjectContext: '',
@@ -939,6 +938,47 @@ function getModeConfig(mode, academicSubject = '') {
     systemInstruction = `You are a master scientific communicator and school tutor. ${subjectPrefix}Analyze the provided study material and translate it into a simple explanation suitable for a child (ELI5 mode). Avoid technical terminology. Adhere strictly to the JSON schema.`;
     userPrompt = `Explain this concept like I am 5 years old. Use a playful, understandable analogy and clear language.`;
     
+  } else if (mode === 'notes') {
+    schema = {
+      type: 'object',
+      properties: {
+        title: { type: 'string', description: 'Comprehensive study card outline title' },
+        subtitle: { type: 'string', description: 'Subject classification' },
+        sections: {
+          type: 'array',
+          description: 'A detailed, hierarchical study outline of the material',
+          items: {
+            type: 'object',
+            properties: {
+              header: { type: 'string', description: 'Main concept header (e.g. key phase, topic, or main division)' },
+              subsections: {
+                type: 'array',
+                items: {
+                  type: 'object',
+                  properties: {
+                    subHeader: { type: 'string', description: 'Sub-header diving into a specific subtopic or detail' },
+                    bullets: {
+                      type: 'array',
+                      items: {
+                        type: 'string',
+                        description: 'A comprehensive bullet point detailing a key fact, detail, formula, or concept (1-2 sentences)'
+                      }
+                    }
+                  },
+                  required: ['subHeader', 'bullets']
+                }
+              }
+            },
+            required: ['header', 'subsections']
+          }
+        }
+      },
+      required: ['title', 'subtitle', 'sections']
+    };
+    
+    systemInstruction = `You are a professional academic summarizer and study guide outline compiler. ${subjectPrefix}Analyze the study source text/image. Generate a highly structured, comprehensive, and detailed outline with Main Headers, Sub-Headers, and key bullet points. Do not omit crucial definitions, concepts, or details. Format output STRICTLY as JSON adhering to the provided schema.`;
+    userPrompt = `Perform a comprehensive study outline of the provided study material. Organize it into main conceptual headers (sections), relevant sub-headers (subsections), and key detail bullet points (bullets).`;
+
   } else { // flashcards
     schema = {
       type: 'object',
@@ -1054,6 +1094,39 @@ function loadDeck(deckId) {
     
     bodyHtml = `<div class="card-body">${analogy}${explanation}${funfact}</div>`;
     
+  } else if (deck.mode === 'notes') {
+    let sectionsHtml = '<div class="outline-sections-container">';
+    d.sections.forEach(sec => {
+      sectionsHtml += `
+        <div class="outline-section">
+          <h3 class="outline-section-header">${escapeHtml(sec.header)}</h3>
+      `;
+      
+      sec.subsections.forEach(sub => {
+        sectionsHtml += `
+          <div class="outline-subsection">
+            <h4 class="outline-subsection-header">${escapeHtml(sub.subHeader)}</h4>
+            <ul class="outline-bullets-list">
+        `;
+        
+        sub.bullets.forEach(b => {
+          sectionsHtml += `
+            <li class="outline-bullet-item">${escapeHtml(b)}</li>
+          `;
+        });
+        
+        sectionsHtml += `
+            </ul>
+          </div>
+        `;
+      });
+      
+      sectionsHtml += `</div>`; // Close outline-section
+    });
+    sectionsHtml += '</div>';
+    
+    bodyHtml = `<div class="card-body">${sectionsHtml}</div>`;
+    
   } else if (deck.mode === 'flashcards') {
     let grid = '<div class="flashcards-grid">';
     d.cards.forEach((c, idx) => {
@@ -1114,6 +1187,7 @@ function loadDeck(deckId) {
 function getModeLabel(mode) {
   if (mode === 'summary') return 'Summary Bullets';
   if (mode === 'eli5') return 'ELI5 Simplification';
+  if (mode === 'notes') return 'Detailed Outline';
   if (mode === 'flashcards') return 'Q&A Flashcards';
   return 'Study Deck';
 }
@@ -1281,6 +1355,17 @@ function handleTextDownload() {
     mdText += `### Analogy: ${d.analogyTitle}\n${d.analogy}\n\n`;
     mdText += `### Simple Explanation\n${d.simpleExplanation}\n\n`;
     mdText += `### Fun Fact\n${d.funFact}\n`;
+  } else if (activeDeck.mode === 'notes') {
+    d.sections.forEach(sec => {
+      mdText += `### ${sec.header}\n\n`;
+      sec.subsections.forEach(sub => {
+        mdText += `#### ${sub.subHeader}\n`;
+        sub.bullets.forEach(b => {
+          mdText += `* ${b}\n`;
+        });
+        mdText += `\n`;
+      });
+    });
   } else if (activeDeck.mode === 'flashcards') {
     d.cards.forEach((c, idx) => {
       mdText += `Card ${idx + 1}\n`;

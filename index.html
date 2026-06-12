@@ -16,21 +16,21 @@
   <title>Open Study Deck | Privacy-First AI Study Card Studio</title>
   
   <!-- SEO & Social Meta Tags -->
-  <meta name="description" content="A privacy-first, zero-paywall AI study card studio. Generate high-fidelity flashcards, simple explanations, and summaries from textbooks, notes, or links using Google Gemini API locally.">
+  <meta name="description" content="A privacy-first, zero-paywall AI study card studio. Generate high-fidelity flashcards, simple explanations, detailed outlines, and summaries from textbooks, notes, or links using Google Gemini API locally.">
   <meta name="keywords" content="flashcards, study app, AI flashcards, Gemini API, textbook summarizer, privacy first study, local study cards, AI Flashcard Generator from Image, convert picture to flashcards online, photo to study notes converter, textbook screenshot summarizer ai, study deck, open study deck, visual study cards, free flashcard maker, export flashcards as PNG, active recall app, spaced repetition maker, client-side flashcards, digital study deck, visual study card maker">
   <link rel="canonical" href="https://openstudydeck.com/">
   <meta name="robots" content="index, follow">
 
   <!-- Open Graph / Facebook -->
   <meta property="og:title" content="Open Study Deck | Privacy-First AI Study Card Studio">
-  <meta property="og:description" content="Generate beautiful, exportable digital flashcards and summaries from notes or links with your own Gemini API key. Zero SaaS paywalls.">
+  <meta property="og:description" content="Generate beautiful, exportable digital flashcards, detailed outlines, and summaries from notes or links with your own Gemini API key. Zero SaaS paywalls.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://openstudydeck.com/">
 
   <!-- Twitter Cards -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Open Study Deck | Privacy-First AI Study Card Studio">
-  <meta name="twitter:description" content="Generate high-fidelity study cards and outlines from notes or links with your own Gemini API key. Zero SaaS paywalls.">
+  <meta name="twitter:description" content="Generate high-fidelity study cards, detailed outlines, and summaries from notes or links with your own Gemini API key. Zero SaaS paywalls.">
 
   <!-- Schema.org JSON-LD Structured Data for WebApplication -->
   <script type="application/ld+json">
@@ -39,7 +39,7 @@
     "@type": "WebApplication",
     "name": "Open Study Deck",
     "url": "https://openstudydeck.com/",
-    "description": "A privacy-first, zero-paywall AI study card studio. Generate digital active-recall flashcards, simple explanations (ELI5), and outlines from textbooks, screenshots, or notes using the Google Gemini API locally in your browser.",
+    "description": "A privacy-first, zero-paywall AI study card studio. Generate digital active-recall flashcards, simple explanations (ELI5), detailed outlines, and outlines from textbooks, screenshots, or notes using the Google Gemini API locally in your browser.",
     "applicationCategory": "EducationalApplication",
     "operatingSystem": "All",
     "browserRequirements": "Requires JavaScript. Requires HTML5.",
@@ -311,6 +311,19 @@
                       <line x1="12" y1="8" x2="12.01" y2="8"></line>
                     </svg>
                     <span>ELI5 Mode</span>
+                  </div>
+                </label>
+
+                <label class="mode-card" for="mode-notes">
+                  <input type="radio" name="study-mode" id="mode-notes" value="notes">
+                  <div class="mode-card-content">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                      <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                      <line x1="9" y1="9" x2="15" y2="9"></line>
+                      <line x1="9" y1="13" x2="15" y2="13"></line>
+                      <line x1="9" y1="17" x2="13" y2="17"></line>
+                    </svg>
+                    <span>Detailed Outline</span>
                   </div>
                 </label>
                 
@@ -649,7 +662,7 @@
               <strong class="font-semibold text-slate-900 dark:text-white text-base block mb-2">Convert Picture to Flashcards Online:</strong> Simply drag and drop your study slides or textbook screenshots into the workstation. Our system will scan and <strong>extract study cards from image</strong> inputs in seconds, parsing complex diagrams, structures, and tables instantly.
             </li>
             <li class="p-6 bg-slate-50 dark:bg-slate-800/40 rounded-xl border border-slate-100 dark:border-slate-800/80 shadow-sm">
-              <strong class="font-semibold text-slate-900 dark:text-white text-base block mb-2">Textbook Screenshot Summarizer AI:</strong> Working through dense, boring chapters? Use our visual processing to <strong>convert image to study guide</strong> summaries. You can toggle between comprehensive outlines or a simplified "Explain Like I'm 5" (ELI5) mode.
+              <strong class="font-semibold text-slate-900 dark:text-white text-base block mb-2">Textbook Screenshot Summarizer AI:</strong> Working through dense, boring chapters? Use our visual processing to <strong>convert image to study guide</strong> summaries. You can toggle between comprehensive outlines, a simplified "Explain Like I'm 5" (ELI5) mode, or structured detailed outlines with headers, sub-headers, and bullet points.
             </li>
             <li class="p-6 bg-slate-50 dark:bg-slate-800/40 rounded-xl border border-slate-100 dark:border-slate-800/80 shadow-sm">
               <strong class="font-semibold text-slate-900 dark:text-white text-base block mb-2">Photo to Study Notes Converter:</strong> Snap a picture of your handwritten lecture notes and let the AI instantly clean them up. It acts as a <strong>picture to flashcard maker free</strong> of charge, saving you hours of transcription.

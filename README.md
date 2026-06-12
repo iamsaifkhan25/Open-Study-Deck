@@ -1,6 +1,6 @@
 # Open Study Deck
 
-A privacy-first, zero-paywall AI study card studio for students. It takes uploaded pictures of textbooks/notes or pasted web links/texts, analyzes them using AI, and renders beautiful, exportable digital flashcards and summaries.
+A privacy-first, zero-paywall AI study card studio for students. It takes uploaded pictures of textbooks/notes or pasted web links/texts, analyzes them using AI, and renders beautiful, exportable digital flashcards, bullet notes, and summaries.
 
 ---
 
@@ -15,9 +15,10 @@ Built after noticing students manually creating study notes with AI tools. Open 
 1.  **Bring Your Own Key (BYOK):** Bypasses SaaS subscription paywalls by letting you use your own local Google Gemini API key. All generations are direct and free.
 2.  **Privacy-First & Browser-Native:** No signup, no user authentication, and no databases. The entire app runs 100% on the client side. Your API key and study deck history are stored locally in your browser's `localStorage` and never sent to any backend server.
 3.  **High-Fidelity presentation:** Clean, content-aware container cards with responsive typographic scales, rounded shapes, and stacked shadow levels.
-4.  **Three Visual study Modes:**
+4.  **Four Visual study Modes:**
     *   **Summarize:** Outputs structured bullet highlights with bold concepts and a highlighted core takeaway box.
     *   **ELI5 (Explain Like I'm 5):** Renders a creative analogy comparison, a simplified explanation, and a trivia "fun fact" callout.
+    *   **Detailed Outline:** Outputs a hierarchical outline with main headers, sub-headers, and detailed bullet notes.
     *   **Flashcards:** Outputs interactive Q&A cards with full 3D flip card animations on click.
 5.  **Multi-Theme Card Canvas:** Switch between 4 premium backgrounds:
     *   *Aura Mesh:* An ethereal, animated mesh gradient backdrop (Vercel-inspired cyan-blue-violet-pink).
