@@ -45,8 +45,8 @@
       align-items: center;
       justify-content: center;
       padding: var(--space-2xl) var(--space-xl);
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px dashed rgba(0, 0, 0, 0.1);
+      background: linear-gradient(135deg, rgba(14, 165, 233, 0.04), rgba(236, 72, 153, 0.04), rgba(99, 102, 241, 0.04));
+      border: 1px dashed rgba(14, 165, 233, 0.25);
       border-radius: var(--radius-lg);
       text-align: center;
       margin-bottom: var(--space-xl);
@@ -54,10 +54,11 @@
       overflow: hidden;
       backdrop-filter: blur(8px);
       -webkit-backdrop-filter: blur(8px);
+      transition: all var(--transition-normal);
     }
     body.dark-mode .launch-soon-card {
-      background: rgba(255, 255, 255, 0.01);
-      border-color: rgba(255, 255, 255, 0.08);
+      background: linear-gradient(135deg, rgba(14, 165, 233, 0.015), rgba(236, 72, 153, 0.015), rgba(99, 102, 241, 0.015));
+      border-color: rgba(236, 72, 153, 0.18);
     }
     .launch-soon-badge {
       display: inline-flex;
@@ -101,6 +102,138 @@
     @keyframes pulse-border {
       0%, 100% { border-color: rgba(14, 165, 233, 0.25); }
       50% { border-color: rgba(236, 72, 153, 0.45); }
+    }
+
+    /* CSS Frosting Featured Card Style */
+    .featured-project-card {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-md);
+      padding: var(--space-xl);
+      background: linear-gradient(135deg, rgba(14, 165, 233, 0.06), rgba(99, 102, 241, 0.06));
+      border: 1px solid rgba(14, 165, 233, 0.2);
+      border-radius: var(--radius-lg);
+      margin-bottom: var(--space-xl);
+      position: relative;
+      overflow: hidden;
+      transition: all var(--transition-normal);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.01);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+    }
+    
+    body.dark-mode .featured-project-card {
+      background: linear-gradient(135deg, rgba(14, 165, 233, 0.02), rgba(99, 102, 241, 0.02));
+      border-color: rgba(14, 165, 233, 0.15);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    }
+    
+    .featured-project-card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(14, 165, 233, 0.35);
+      box-shadow: 0 8px 30px rgba(14, 165, 233, 0.06);
+    }
+    
+    body.dark-mode .featured-project-card:hover {
+      border-color: rgba(14, 165, 233, 0.25);
+      box-shadow: 0 8px 30px rgba(14, 165, 233, 0.12);
+    }
+    
+    .project-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      gap: var(--space-sm);
+    }
+    
+    .project-title-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-xxs);
+    }
+    
+    .project-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-xs);
+      padding: 6px 14px;
+      background: linear-gradient(135deg, rgba(14, 165, 233, 0.12), rgba(99, 102, 241, 0.12));
+      border: 1px solid rgba(14, 165, 233, 0.25);
+      border-radius: var(--radius-pill);
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--ds-blue);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      width: fit-content;
+    }
+    
+    .project-tagline {
+      font-size: 14px;
+      color: var(--text-mute);
+      margin-top: var(--space-xxs);
+      line-height: 1.4;
+    }
+    
+    .project-features-list {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--space-sm);
+      margin: var(--space-xs) 0;
+      padding-left: 0;
+      list-style: none;
+    }
+    
+    @media (min-width: 640px) {
+      .project-features-list {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+    
+    .project-feature-item {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-xs);
+      font-size: 13px;
+      color: var(--text-body);
+      line-height: 1.4;
+    }
+    
+    .project-feature-icon {
+      flex-shrink: 0;
+      color: var(--ds-blue);
+      margin-top: 3px;
+    }
+    
+    .project-action-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-xs);
+      padding: 10px var(--space-lg);
+      background-color: var(--primary-cta);
+      color: var(--primary-cta-text);
+      border: none;
+      border-radius: var(--radius-md);
+      font-family: var(--font-sans);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all var(--transition-fast);
+      align-self: flex-start;
+      margin-top: var(--space-xs);
+    }
+    
+    .project-action-btn:hover {
+      background-color: var(--primary-cta-hover);
+      transform: translateX(2px);
+    }
+    
+    body.dark-mode .project-action-btn:hover {
+      background-color: var(--ds-gray-200);
+      color: var(--ds-gray-1000);
     }
   </style>
 </head>
@@ -160,10 +293,67 @@
 
         <div class="workspace-card flex-col" style="gap: var(--space-md); padding: var(--space-xl); margin-bottom: var(--space-xl);">
           
+          <!-- Featured Project: CSS Frosting -->
+          <div class="featured-project-card">
+            <div class="project-header">
+              <div class="project-title-wrapper">
+                <div class="project-badge">
+                  <span class="pulse-dot" style="background-color: #0070f3;"></span>
+                  Live Project
+                </div>
+                <h2 class="settings-card-title" style="margin-top: var(--space-xs); margin-bottom: 0;">CSS Frosting</h2>
+                <div class="project-tagline">Premium developer canvas for glassmorphism styles and real-time diagnostic analysis.</div>
+              </div>
+            </div>
+            
+            <p class="settings-card-text" style="margin: 0; line-height: 1.5;">
+              CSS Frosting is a modern design platform built with React 19, Next.js 16, and Tailwind CSS v4. It enables developers to design, test, and export high-performance glassmorphic UI components, featuring full CSS compliance checks and multiple code exports.
+            </p>
+
+            <ul class="project-features-list">
+              <li class="project-feature-item">
+                <svg class="project-feature-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                <div><strong>Frosting Canvas</strong>: Fine-tune backdrop blurs, shadows, and transparency with real-time sliders.</div>
+              </li>
+              <li class="project-feature-item">
+                <svg class="project-feature-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                <div><strong>Diagnostic Analyzer</strong>: Automatically validates your code for transparency rules, refraction borders, and compliance.</div>
+              </li>
+              <li class="project-feature-item">
+                <svg class="project-feature-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                <div><strong>Multi-Framework Exporter</strong>: Instantly copy custom styles formatted for CSS, Tailwind v4, Styled-Components, or inline React.</div>
+              </li>
+              <li class="project-feature-item">
+                <svg class="project-feature-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                <div><strong>Premium presets</strong>: Curated templates including Glass Credit Cards, Premium Modals, and Navigation Bars.</div>
+              </li>
+            </ul>
+
+            <a href="https://cssfrosting.com" target="_blank" rel="noopener noreferrer" class="project-action-btn">
+              <span>Explore cssfrosting.com</span>
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+              </svg>
+            </a>
+          </div>
+
+          <!-- Divider -->
+          <hr class="card-divider" style="margin: var(--space-xs) 0;">
+
+          <!-- More Coming Soon Card -->
           <div class="launch-soon-card">
             <div class="launch-soon-badge">
               <span class="pulse-dot"></span>
-              Launching Soon
+              More Coming Soon
             </div>
             <h2 class="settings-card-title" style="margin-bottom: var(--space-xs);">Project Hub & Connected Tools</h2>
             <p class="settings-card-text" style="max-width: 500px; margin: 0 auto;">Our connected developer suite is currently being optimized and is getting ready to showcase exciting utilities.</p>
