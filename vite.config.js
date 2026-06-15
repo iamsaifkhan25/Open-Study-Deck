@@ -21,6 +21,19 @@ export default defineConfig(({ mode }) => {
     },
     plugins: [
       {
+        name: 'clean-urls',
+        configureServer(server) {
+          server.middlewares.use((req, res, next) => {
+            const url = new URL(req.url, 'http://localhost');
+            const pathname = url.pathname;
+            if (pathname !== '/' && !pathname.includes('.') && !pathname.startsWith('/api')) {
+              req.url = pathname + '.html' + url.search;
+            }
+            next();
+          });
+        }
+      },
+      {
         name: 'razorpay-api-mock',
         configureServer(server) {
           server.middlewares.use(async (req, res, next) => {

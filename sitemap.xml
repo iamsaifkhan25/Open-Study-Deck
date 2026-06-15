@@ -7,31 +7,31 @@
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://openstudydeck.com/about.html</loc>
+    <loc>https://openstudydeck.com/about</loc>
     <lastmod>2026-06-11</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://openstudydeck.com/projects.html</loc>
+    <loc>https://openstudydeck.com/projects</loc>
     <lastmod>2026-06-11</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://openstudydeck.com/privacy.html</loc>
+    <loc>https://openstudydeck.com/privacy</loc>
     <lastmod>2026-06-11</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://openstudydeck.com/terms.html</loc>
+    <loc>https://openstudydeck.com/terms</loc>
     <lastmod>2026-06-11</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://openstudydeck.com/contact.html</loc>
+    <loc>https://openstudydeck.com/contact</loc>
     <lastmod>2026-06-11</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
