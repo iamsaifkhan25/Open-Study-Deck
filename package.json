@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "deploy": "npx wrangler pages deploy ./dist --project-name openstudydeck"
+    "deploy": "npx wrangler pages deploy ./dist --project-name openstudydeck --branch main"
   },
   "devDependencies": {
     "vite": "^5.0.0"
