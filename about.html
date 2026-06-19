@@ -90,24 +90,71 @@
         <header class="section-page-header">
           <span class="page-eyebrow">Creative Vision</span>
           <h2>About Us</h2>
-        </header>
-
-        <div class="workspace-card flex-col" style="gap: var(--space-md); padding: var(--space-xl); margin-bottom: var(--space-xl);">
-          <h3 class="settings-card-title">Our Story & Mission</h3>
-          <p class="settings-card-text">Open Study Deck was born out of frustration. As students and self-learners, we were exhausted by seeing basic, helpful educational tools locked behind monthly SaaS subscriptions and restrictive analytical paywalls. We believed that study tools shouldn't carry a price tag that gates your grades.</p>
-          <p class="settings-card-text">Our mission is to democratize digital learning. By creating a multi-page, serverless environment, we put you in charge of your own data and model allocations. Using Google Gemini API directly from your browser means you get high-fidelity visual cards and textbook summarization completely client-side without subscription popups or tracking.</p>
+        </header>        <div class="workspace-card flex-col" style="gap: var(--space-md); padding: var(--space-xl); margin-bottom: var(--space-xl);">
+          
+          <h3 class="settings-card-title">Our Story &amp; Mission: Democratizing Education</h3>
+          <p class="settings-card-text">
+            Open Study Deck was born out of frustration. As students and self-learners, we were exhausted by seeing basic, helpful educational tools locked behind monthly SaaS subscriptions and restrictive analytical paywalls. We believed that study tools shouldn&apos;t carry a price tag that gates your grades. Too often, students are forced to choose between paying for premium subscriptions or manually writing out definitions, notes, and outlines. This economic barrier makes learning harder for those who need it most.
+          </p>
+          <p class="settings-card-text">
+            Our mission is to democratize digital learning. By creating a serverless, multi-page web application, we put you in charge of your own data and model allocations. Using the Google Gemini API directly from your browser means you get high-fidelity visual cards and textbook summarizations completely client-side. There are no registration forms, no usage ceilings, and no subscription popups interrupting your study flow.
+          </p>
+          <p class="settings-card-text">
+            By offering a completely <strong>free alternative to AI study apps</strong>, we hope to build a workspace where any student can study effectively. Whether you are analyzing organic chemistry diagrams, medical charts, or legal briefs, Open Study Deck provides an unthrottled environment that works at your pace, completely free of charge.
+          </p>
 
           <hr class="card-divider">
 
-          <h3 class="settings-card-title">The BYOK Philosophy</h3>
-          <p class="settings-card-text">"Bring Your Own Key" (BYOK) is a developer-centric architectural approach that we brought to the student community. When apps host keys, they have to pay for servers, scale infrastructure, and charge you a premium markup. BYOK eliminates the middleman. You grab a free API key from Google AI Studio, input it into your local browser settings, and make queries directly. No signup database, zero cloud hosting costs, and 100% savings passed to you.</p>
+          <h3 class="settings-card-title">The BYOK (Bring Your Own Key) Philosophy &amp; Absolute Privacy</h3>
+          <p class="settings-card-text">
+            &quot;Bring Your Own Key&quot; (BYOK) is a developer-centric architectural approach that we brought to the student community. When standard applications host API keys, they have to pay for server hosting, database maintenance, and cloud bandwidth. To cover these costs and make a profit, they charge users a monthly markup. BYOK eliminates the middleman. You grab a free API key from Google AI Studio, save it in your browser settings, and make queries directly to Google. This keeps our platform free to use, passing all savings directly to you.
+          </p>
+          <p class="settings-card-text">
+            This model also makes Open Study Deck a <strong>privacy first ai flashcard generator</strong>. Other platforms require you to upload your lecture files and screenshots to their external servers, where they analyze and store your data. Open Study Deck doesn&apos;t have login databases, analytics trackers, or sync servers. Everything happens inside your browser. Your notes, images, and API key stay on your local disk.
+          </p>
+          <p class="settings-card-text">
+            Your key is cached securely in your browser&apos;s persistent LocalStorage, allowing you to use the tool without re-entering credentials on every visit. Queries are sent via encrypted HTTPS connections directly to Google&apos;s models. We cannot see, access, or record your key or study documents. This design keeps your coursework completely secure and private.
+          </p>
 
           <hr class="card-divider">
 
-          <h3 class="settings-card-title">Key Studio Capabilities</h3>
-          <p class="settings-card-text">Every line of code inside the Open Study Deck workshop is tuned for responsive visual execution. Our visual studio allows you to style active meshes, drop textbook screenshots, and output active-recall flashcards as PNG files to your device instantly. It is built to keep up with heavy medical and legal reading volumes without any SaaS limits.</p>
+          <h3 class="settings-card-title">Visual Conversion, Multimodal Processing &amp; OCR Engine</h3>
+          <p class="settings-card-text">
+            Our studio workspace includes a powerful <strong>AI Flashcard Generator from Image</strong>. Students no longer need to spend hours manually typing terms and definitions into card templates. Drag and drop your textbook photos, slides, or handwritten notes into our workspace drop zone.
+          </p>
+          <p class="settings-card-text">
+            The app utilizes Gemini&apos;s multimodal processing to scan images natively inside the browser viewport. The system reads hand-written characters, maps layouts, and identifies key definitions. It lets you <strong>convert picture to flashcards online</strong> in seconds, converting slides to study guides.
+          </p>
+          <p class="settings-card-text">
+            If you are working with long chapters, our textbook screenshot summarizer AI is an excellent tool. It functions as a photo to study notes converter, allowing you to convert screenshots to comprehensive detailed outlines or summaries. You can also toggle the &quot;Explain Like I&apos;m 5&quot; (ELI5) mode to break down complex topics into simple analogies. This is ideal for medical and legal students working with heavy reading volumes.
+          </p>
+
+          <hr class="card-divider">
+
+          <h3 class="settings-card-title">Custom Aesthetic Canvas &amp; Dynamic PNG Image Export</h3>
+          <p class="settings-card-text">
+            Visual presentation is key for memory retention. Open Study Deck is a modern <strong>visual study card maker online</strong>, letting you customize card designs. The canvas toolbar provides several styling presets:
+          </p>
+          <ul class="settings-card-text" style="padding-left: 20px; list-style-type: disc; display: flex; flex-direction: column; gap: 8px;">
+            <li><strong>Aura Mesh:</strong> Features dark mode styling with glowing background gradients (violet, cyan, pink) that react dynamically to inputs.</li>
+            <li><strong>Cyber Midnight:</strong> A high-contrast dark theme optimized for late-night study sessions.</li>
+            <li><strong>Sunset Glow:</strong> A warm gradient palette that reduces eye strain during long reviews.</li>
+            <li><strong>Minimal Grid:</strong> A clean layout featuring a subtle grid pattern for minimalist designs.</li>
+          </ul>
+          <p class="settings-card-text">
+            Once you style your study deck, you can instantly export the cards. Our tool uses the HTML2Canvas library to capture your styled workspace and <strong>export flashcards as PNG</strong> images. You can save these images directly to your phone gallery, import them into digital planners, or share them with classmates. This ensures you have access to your study decks on any device.
+          </p>
+
+          <hr class="card-divider">
+
+          <h3 class="settings-card-title">The Future of Serverless Learning</h3>
+          <p class="settings-card-text">
+            Open Study Deck is a community-driven, open-source project. Because we don&apos;t run central servers, the platform requires no hosting fees, ensuring it will remain free and open to everyone forever.
+          </p>
+          <p class="settings-card-text">
+            If this tool has saved you time, consider supporting the developer by clicking the coffee donation link inside the dashboard to buy them a coffee, or by sharing openstudydeck.com with classmates. By working together, we can keep educational tools accessible and paywall-free for students everywhere.
+          </p>
         </div>
-
       </div>
     </section>
 
