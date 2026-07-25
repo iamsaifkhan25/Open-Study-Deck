@@ -16,6 +16,7 @@ import {
   isRetryableForLength,
   RESPONSE_ISSUE
 } from './shared/study-config.js';
+import { validateApiKeyFormat } from './shared/api-key-validation.js';
 import {
   initializeAnalyticsConsent,
   trackAnalyticsEvent
@@ -381,30 +382,6 @@ function syncApiKeyUI() {
   notes.forEach(n => { if (n) n.textContent = noteText; });
 
   checkApiStatus();
-}
-
-// Local format validation only. A real Gemini request can still fail
-// (invalid key, quota, model, or network errors) even if this check passes.
-function validateApiKeyFormat(rawValue) {
-  const value = (rawValue || '').trim();
-
-  if (!value) {
-    return { valid: false, reason: 'Please enter your Gemini API key.' };
-  }
-  if (/\s/.test(value)) {
-    return { valid: false, reason: 'API key must not contain spaces.' };
-  }
-  if (value.length < 30) {
-    return { valid: false, reason: 'That key looks too short to be a valid Gemini API key.' };
-  }
-  if (!/^[A-Za-z0-9_-]+$/.test(value)) {
-    return { valid: false, reason: 'API key contains unexpected characters.' };
-  }
-  if (!value.startsWith('AIza')) {
-    return { valid: false, reason: 'Gemini API keys normally start with "AIza". Please double-check your key.' };
-  }
-
-  return { valid: true, value };
 }
 
 function applyTheme(themeName) {
