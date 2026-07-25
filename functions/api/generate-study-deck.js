@@ -208,7 +208,12 @@ async function callGemini({ apiKey, model, contentPart, modeConfig }) {
     contents: [{ role: 'user', parts: [contentPart, { text: userPrompt }] }],
     generationConfig: {
       responseMimeType: 'application/json',
-      responseSchema: schema,
+      // Match the BYOK client (app.js), which uses the SDK's
+      // `responseJsonSchema` field — the full-JSON-Schema field, not the
+      // older/stricter OpenAPI-subset `responseSchema` field. Using the
+      // wrong one here caused Gemini to reject these schemas with
+      // INVALID_ARGUMENT.
+      responseJsonSchema: schema,
       temperature: 0.2
     }
   };
