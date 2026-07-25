@@ -3,10 +3,30 @@
    ========================================================================== */
 
 import { GoogleGenAI } from 'https://cdn.jsdelivr.net/npm/@google/genai/+esm';
+import {
+  STUDY_MODES,
+  MAX_TEXT_INPUT_LENGTH,
+  MAX_SUBJECT_CONTEXT_LENGTH,
+  ALLOWED_IMAGE_MIME_TYPES,
+  MAX_GUEST_IMAGE_BYTES,
+  buildModeConfig,
+  getModeLabel
+} from './shared/study-config.js';
+import {
+  initializeAnalyticsConsent,
+  trackAnalyticsEvent
+} from './analytics-consent.js';
+
+// --- Storage Keys ---
+// Same key name is reused across localStorage/sessionStorage (separate storage areas,
+// no collision) so any pre-existing localStorage key from before this change still loads.
+const API_KEY_STORAGE_KEY = 'openstudydeck_api_key';
+const ACCESS_MODE_STORAGE_KEY = 'openstudydeck_access_mode';
 
 // --- Application State ---
 const State = {
   apiKey: '',
+  rememberKey: false, // whether the key is persisted in localStorage vs sessionStorage
   activeTab: 'image', // 'image' | 'text'
   uploadedImageBase64: null,
   uploadedImageMimeType: null,
@@ -16,7 +36,15 @@ const State = {
   focusSubjectContext: '',
   isGenerating: false,
   history: [],
-  activeDeckId: null
+  activeDeckId: null,
+
+  // Guest / BYOK access mode
+  accessMode: 'guest', // 'guest' | 'byok'
+  guestConfig: { guestModeEnabled: false, turnstileSiteKey: null, guestDailyLimit: 5 },
+  guestConfigLoaded: false,
+  guestUsageRemaining: null,
+  turnstileWidgetId: null,
+  turnstileToken: null
 };
 
 // --- DOM Cache ---
@@ -44,8 +72,17 @@ const DOM = {
   
   // Advanced Settings
   modelSelector: document.getElementById('model-selector'),
+  modelSelectorGuestNote: document.getElementById('model-selector-guest-note'),
   systemContextInput: document.getElementById('system-context-input'),
-  
+
+  // Access Mode (Guest / BYOK)
+  accessModeGuestRadio: document.getElementById('access-mode-guest'),
+  accessModeByokRadio: document.getElementById('access-mode-byok'),
+  guestPanel: document.getElementById('guest-panel'),
+  guestQuotaText: document.getElementById('guest-quota-text'),
+  turnstileContainer: document.getElementById('turnstile-container'),
+  guestStatusMessage: document.getElementById('guest-status-message'),
+
   // Action triggers
   generateBtn: document.getElementById('generate-btn'),
   
@@ -78,7 +115,8 @@ document.addEventListener('DOMContentLoaded', () => {
   initScrollAnimations();
   initModalHandlers();
   initSupportHandlers();
-  
+  initAccessMode();
+
   // Ensure we start with the empty state on page refresh
   setEmptyState();
 });
@@ -255,13 +293,18 @@ function initScrollAnimations() {
 
 // --- Local Storage Management ---
 function loadSavedSettings() {
-  State.apiKey = localStorage.getItem('openstudydeck_api_key') || '';
-  if (State.apiKey) {
-    DOM.apiKeyInput.value = State.apiKey;
-    const modalInput = document.getElementById('api-key-input-modal');
-    if (modalInput) modalInput.value = State.apiKey;
+  // A key already in localStorage (legacy behaviour, or a prior "remember" opt-in)
+  // takes priority and implies "Remember this key on this device" is enabled.
+  const persistedKey = localStorage.getItem(API_KEY_STORAGE_KEY);
+  if (persistedKey) {
+    State.apiKey = persistedKey;
+    State.rememberKey = true;
+  } else {
+    State.apiKey = sessionStorage.getItem(API_KEY_STORAGE_KEY) || '';
+    State.rememberKey = false;
   }
-  
+  syncApiKeyUI();
+
   // Load History
   try {
     const rawHistory = localStorage.getItem('openstudydeck_history');
@@ -290,20 +333,68 @@ function saveHistory() {
 // --- Status & Theme Updates ---
 function checkApiStatus() {
   const badges = [DOM.apiStatus, document.getElementById('api-status-modal')];
-  
+
   badges.forEach(badge => {
     if (!badge) return;
     const dot = badge.querySelector('.status-dot');
     const text = badge.querySelector('.status-text');
-    
-    if (State.apiKey && State.apiKey.trim().length >= 8) {
+
+    if (State.apiKey) {
+      // Format validation only — this does not confirm the key is active with Google.
       dot.className = 'status-dot dot-green';
-      text.textContent = 'Key Active (BYOK)';
+      text.textContent = 'Key Configured';
     } else {
       dot.className = 'status-dot dot-red';
       text.textContent = 'Key Required';
     }
   });
+}
+
+// Keeps both API-key inputs, both "Remember" checkboxes, storage-status notes,
+// the remember-warning visibility, and the status badges all in sync with State.
+function syncApiKeyUI() {
+  const inputs = [DOM.apiKeyInput, document.getElementById('api-key-input-modal')];
+  const checkboxes = [document.getElementById('remember-key-checkbox'), document.getElementById('remember-key-checkbox-modal')];
+  const warnings = [document.getElementById('api-key-remember-warning'), document.getElementById('api-key-remember-warning-modal')];
+  const notes = [document.getElementById('api-key-storage-note'), document.getElementById('api-key-storage-note-modal')];
+
+  inputs.forEach(input => { if (input) input.value = State.apiKey; });
+  checkboxes.forEach(cb => { if (cb) cb.checked = State.rememberKey; });
+  warnings.forEach(w => { if (w) w.style.display = State.rememberKey ? 'block' : 'none'; });
+
+  let noteText = '';
+  if (State.apiKey) {
+    noteText = State.rememberKey
+      ? 'Key remembered on this device. Avoid using this option on shared computers.'
+      : 'Key saved for this browser session.';
+  }
+  notes.forEach(n => { if (n) n.textContent = noteText; });
+
+  checkApiStatus();
+}
+
+// Local format validation only. A real Gemini request can still fail
+// (invalid key, quota, model, or network errors) even if this check passes.
+function validateApiKeyFormat(rawValue) {
+  const value = (rawValue || '').trim();
+
+  if (!value) {
+    return { valid: false, reason: 'Please enter your Gemini API key.' };
+  }
+  if (/\s/.test(value)) {
+    return { valid: false, reason: 'API key must not contain spaces.' };
+  }
+  if (value.length < 30) {
+    return { valid: false, reason: 'That key looks too short to be a valid Gemini API key.' };
+  }
+  if (!/^[A-Za-z0-9_-]+$/.test(value)) {
+    return { valid: false, reason: 'API key contains unexpected characters.' };
+  }
+  if (!value.startsWith('AIza')) {
+    return { valid: false, reason: 'Gemini API keys normally start with "AIza". Please double-check your key.' };
+  }
+
+  return { valid: true, value };
 }
 
 function applyTheme(themeName) {
@@ -365,15 +456,17 @@ function initEventListeners() {
   document.querySelectorAll('.btn-save-key-class').forEach(btn => {
     btn.addEventListener('click', () => {
       const sourceInputId = btn.dataset.sourceInput;
+      const checkboxId = btn.dataset.rememberCheckbox;
       const inputEl = document.getElementById(sourceInputId);
-      if (inputEl) saveApiKey(inputEl.value.trim());
+      const checkboxEl = checkboxId ? document.getElementById(checkboxId) : null;
+      if (inputEl) saveApiKey(inputEl.value, checkboxEl ? checkboxEl.checked : false);
     });
   });
-  
+
   document.querySelectorAll('.btn-clear-key-class').forEach(btn => {
     btn.addEventListener('click', clearApiKey);
   });
-  
+
   document.querySelectorAll('.toggle-key-visibility-class').forEach(btn => {
     btn.addEventListener('click', () => {
       const targetInputId = btn.dataset.targetInput;
@@ -382,11 +475,27 @@ function initEventListeners() {
     });
   });
 
+  // Keep both "Remember this key on this device" checkboxes in sync and toggle the warning live
+  document.querySelectorAll('.remember-key-checkbox-class').forEach(cb => {
+    cb.addEventListener('change', () => {
+      document.querySelectorAll('.remember-key-checkbox-class').forEach(other => {
+        other.checked = cb.checked;
+      });
+      document.querySelectorAll('.remember-key-warning').forEach(w => {
+        w.style.display = cb.checked ? 'block' : 'none';
+      });
+    });
+  });
+
   // Handle keyboard submission on both inputs
   [DOM.apiKeyInput, document.getElementById('api-key-input-modal')].forEach(input => {
     if (input) {
       input.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') saveApiKey(input.value.trim());
+        if (e.key === 'Enter') {
+          const isModal = input.id === 'api-key-input-modal';
+          const checkboxEl = document.getElementById(isModal ? 'remember-key-checkbox-modal' : 'remember-key-checkbox');
+          saveApiKey(input.value, checkboxEl ? checkboxEl.checked : false);
+        }
       });
     }
   });
@@ -394,7 +503,14 @@ function initEventListeners() {
   // 2. Input Tab Controls
   DOM.tabImage.addEventListener('click', () => switchInputTab('image'));
   DOM.tabText.addEventListener('click', () => switchInputTab('text'));
-  
+
+  // 2b. Study Mode selection
+  document.querySelectorAll('input[name="study-mode"]').forEach((radio) => {
+    radio.addEventListener('change', () => {
+      if (radio.checked) trackAnalyticsEvent('study_mode_selected', { study_mode: radio.value });
+    });
+  });
+
   // 3. Drag & Drop Upload
   const selectFileTrigger = DOM.dropZone.querySelector('.select-file-trigger');
   selectFileTrigger.addEventListener('click', (e) => {
@@ -455,6 +571,7 @@ function initEventListeners() {
       DOM.themeMenu.classList.remove('show');
       DOM.themeMenuTrigger.setAttribute('aria-expanded', 'false');
       showToast(`Applied ${btn.textContent.trim()} theme`, 'success', 2000);
+      trackAnalyticsEvent('theme_selected', { theme_name: theme });
     });
   });
   
@@ -482,39 +599,46 @@ function initEventListeners() {
 }
 
 // --- API Key Handlers ---
-function saveApiKey(value) {
-  if (!value || value.trim().length < 8) {
-    showToast('Please enter a valid API key (minimum 8 characters).', 'warning');
+function saveApiKey(rawValue, remember) {
+  const result = validateApiKeyFormat(rawValue);
+  if (!result.valid) {
+    showToast(result.reason, 'warning');
     return;
   }
-  
-  State.apiKey = value;
-  localStorage.setItem('openstudydeck_api_key', value);
-  
-  // Sync both input fields
-  DOM.apiKeyInput.value = value;
-  const modalInput = document.getElementById('api-key-input-modal');
-  if (modalInput) modalInput.value = value;
-  
-  checkApiStatus();
-  showToast('Gemini API key saved securely locally.', 'success');
-  
+
+  State.apiKey = result.value;
+  State.rememberKey = !!remember;
+
+  if (State.rememberKey) {
+    localStorage.setItem(API_KEY_STORAGE_KEY, State.apiKey);
+    sessionStorage.removeItem(API_KEY_STORAGE_KEY);
+  } else {
+    sessionStorage.setItem(API_KEY_STORAGE_KEY, State.apiKey);
+    localStorage.removeItem(API_KEY_STORAGE_KEY);
+  }
+
+  syncApiKeyUI();
+  showToast(
+    State.rememberKey
+      ? 'Key remembered on this device. Avoid using this option on shared computers.'
+      : 'Key saved for this browser session.',
+    'success'
+  );
+
   // Close modal if open
   document.getElementById('api-modal').style.display = 'none';
 }
 
 function clearApiKey() {
   State.apiKey = '';
-  localStorage.removeItem('openstudydeck_api_key');
-  
-  // Clear both input fields
-  DOM.apiKeyInput.value = '';
-  const modalInput = document.getElementById('api-key-input-modal');
-  if (modalInput) modalInput.value = '';
-  
-  checkApiStatus();
-  showToast('API key removed from local storage.', 'info');
-  
+  State.rememberKey = false;
+
+  localStorage.removeItem(API_KEY_STORAGE_KEY);
+  sessionStorage.removeItem(API_KEY_STORAGE_KEY);
+
+  syncApiKeyUI();
+  showToast('API key removed from this browser.', 'info');
+
   // Close modal if open
   document.getElementById('api-modal').style.display = 'none';
 }
@@ -539,10 +663,215 @@ function toggleKeyVisibility(inputEl, btnEl) {
   }
 }
 
+// --- Access Mode (Guest vs BYOK) ---
+function initAccessMode() {
+  const storedMode = localStorage.getItem(ACCESS_MODE_STORAGE_KEY);
+  State.accessMode = storedMode === 'byok' ? 'byok' : 'guest'; // guest is the default for new visitors
+
+  if (DOM.accessModeGuestRadio) DOM.accessModeGuestRadio.checked = State.accessMode === 'guest';
+  if (DOM.accessModeByokRadio) DOM.accessModeByokRadio.checked = State.accessMode === 'byok';
+
+  [DOM.accessModeGuestRadio, DOM.accessModeByokRadio].forEach((radio) => {
+    if (!radio) return;
+    radio.addEventListener('change', () => {
+      if (!radio.checked) return;
+      State.accessMode = radio.value === 'byok' ? 'byok' : 'guest';
+      localStorage.setItem(ACCESS_MODE_STORAGE_KEY, State.accessMode);
+      syncAccessModeUI();
+    });
+  });
+
+  syncAccessModeUI();
+  fetchPublicConfig();
+}
+
+async function fetchPublicConfig() {
+  if (DOM.guestQuotaText) DOM.guestQuotaText.textContent = 'Checking guest availability…';
+  try {
+    const res = await fetch('/api/public-config');
+    if (!res.ok) throw new Error('public-config request failed');
+    const data = await res.json();
+    State.guestConfig = {
+      guestModeEnabled: !!data.guestModeEnabled,
+      turnstileSiteKey: data.turnstileSiteKey || null,
+      guestDailyLimit: Number(data.guestDailyLimit) > 0 ? Number(data.guestDailyLimit) : 5
+    };
+  } catch (err) {
+    // Network failure, blocked request, or misconfiguration — guest mode is
+    // simply unavailable; BYOK remains fully usable.
+    State.guestConfig = { guestModeEnabled: false, turnstileSiteKey: null, guestDailyLimit: 5 };
+  }
+  State.guestConfigLoaded = true;
+  syncAccessModeUI();
+}
+
+function syncAccessModeUI() {
+  const isGuest = State.accessMode === 'guest';
+
+  if (DOM.guestPanel) DOM.guestPanel.style.display = isGuest ? 'flex' : 'none';
+
+  // Guest mode uses a server-controlled model — never let the browser pick one.
+  if (DOM.modelSelector) DOM.modelSelector.disabled = isGuest;
+  if (DOM.modelSelectorGuestNote) DOM.modelSelectorGuestNote.style.display = isGuest ? 'block' : 'none';
+
+  if (!isGuest) {
+    if (DOM.guestStatusMessage) {
+      DOM.guestStatusMessage.textContent = '';
+      DOM.guestStatusMessage.classList.remove('is-error');
+    }
+    return;
+  }
+
+  if (!State.guestConfigLoaded) {
+    if (DOM.guestQuotaText) DOM.guestQuotaText.textContent = 'Checking guest availability…';
+    return;
+  }
+
+  if (!State.guestConfig.guestModeEnabled || !State.guestConfig.turnstileSiteKey) {
+    if (DOM.guestQuotaText) {
+      DOM.guestQuotaText.textContent = 'Guest access is currently unavailable on this deployment. Please use "Use My Own Key" instead.';
+    }
+    if (DOM.turnstileContainer) DOM.turnstileContainer.innerHTML = '';
+    return;
+  }
+
+  const remaining = State.guestUsageRemaining;
+  if (DOM.guestQuotaText) {
+    DOM.guestQuotaText.textContent = remaining === null
+      ? `You have up to ${State.guestConfig.guestDailyLimit} free guest generations today.`
+      : `${remaining} of ${State.guestConfig.guestDailyLimit} guest generations remaining today.`;
+  }
+
+  renderTurnstileWidget();
+}
+
+// --- Turnstile (guest verification) ---
+let turnstileScriptPromise = null;
+
+function loadTurnstileScript() {
+  if (window.turnstile) return Promise.resolve();
+  if (turnstileScriptPromise) return turnstileScriptPromise;
+
+  turnstileScriptPromise = new Promise((resolvePromise, rejectPromise) => {
+    const script = document.createElement('script');
+    script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
+    script.async = true;
+    script.defer = true;
+    script.onload = () => resolvePromise();
+    script.onerror = () => rejectPromise(new Error('Failed to load Turnstile'));
+    document.body.appendChild(script);
+  });
+
+  return turnstileScriptPromise;
+}
+
+async function renderTurnstileWidget() {
+  if (!DOM.turnstileContainer || State.turnstileWidgetId !== null) return;
+  if (!State.guestConfig.turnstileSiteKey) return;
+
+  try {
+    await loadTurnstileScript();
+    if (!window.turnstile || State.turnstileWidgetId !== null) return;
+
+    State.turnstileWidgetId = window.turnstile.render(DOM.turnstileContainer, {
+      sitekey: State.guestConfig.turnstileSiteKey,
+      callback: (token) => {
+        State.turnstileToken = token;
+        if (DOM.guestStatusMessage) {
+          DOM.guestStatusMessage.textContent = '';
+          DOM.guestStatusMessage.classList.remove('is-error');
+        }
+      },
+      'expired-callback': () => {
+        State.turnstileToken = null;
+      },
+      'error-callback': () => {
+        State.turnstileToken = null;
+        if (DOM.guestStatusMessage) {
+          DOM.guestStatusMessage.textContent = 'Verification widget failed to load. Please refresh or use BYOK.';
+          DOM.guestStatusMessage.classList.add('is-error');
+        }
+      }
+    });
+  } catch (err) {
+    if (DOM.guestStatusMessage) {
+      DOM.guestStatusMessage.textContent = 'Verification widget failed to load. Please refresh or use BYOK.';
+      DOM.guestStatusMessage.classList.add('is-error');
+    }
+  }
+}
+
+function resetTurnstileWidget() {
+  State.turnstileToken = null;
+  if (window.turnstile && State.turnstileWidgetId !== null) {
+    try {
+      window.turnstile.reset(State.turnstileWidgetId);
+    } catch (err) {
+      // Non-fatal — a fresh page load will re-render the widget if this fails.
+    }
+  }
+}
+
+// --- Guest error handling ---
+function mapGuestErrorToFailureCategory(code) {
+  const map = {
+    TURNSTILE_REQUIRED: 'invalid_input',
+    TURNSTILE_FAILED: 'invalid_input',
+    GUEST_DAILY_LIMIT_REACHED: 'quota',
+    INVALID_INPUT: 'invalid_input',
+    INPUT_TOO_LARGE: 'invalid_input',
+    UNSUPPORTED_FILE_TYPE: 'invalid_input',
+    MODEL_UNAVAILABLE: 'model_unavailable',
+    GEMINI_RATE_LIMIT: 'rate_limit',
+    GEMINI_QUOTA_EXCEEDED: 'quota',
+    GEMINI_SAFETY_BLOCK: 'safety_block',
+    GEMINI_SERVICE_UNAVAILABLE: 'service_unavailable',
+    SERVER_CONFIGURATION_ERROR: 'service_unavailable',
+    GUEST_MODE_DISABLED: 'service_unavailable'
+  };
+  return map[code] || 'unknown';
+}
+
+function guestErrorToUserMessage(code, extra = {}) {
+  switch (code) {
+    case 'GUEST_MODE_DISABLED':
+      return 'Guest access is not available on this deployment right now. You can switch to "Use My Own Key" instead.';
+    case 'TURNSTILE_REQUIRED':
+      return 'Please complete the verification challenge, then try again.';
+    case 'TURNSTILE_FAILED':
+      return 'Verification failed. Please retry the challenge.';
+    case 'GUEST_DAILY_LIMIT_REACHED': {
+      const resets = extra.resetsAt ? new Date(extra.resetsAt).toLocaleString() : 'later today';
+      return `Guest access has reached today's allowance. You can try again after ${resets}, or continue using your own Gemini key.`;
+    }
+    case 'INVALID_INPUT':
+      return 'Your request could not be processed. Please check your input and try again.';
+    case 'INPUT_TOO_LARGE':
+      return 'Your image is too large for guest access. Compress it or use BYOK mode.';
+    case 'UNSUPPORTED_FILE_TYPE':
+      return 'That image type is not supported for guest access.';
+    case 'MODEL_UNAVAILABLE':
+      return 'The guest AI model is temporarily unavailable. Please try again shortly.';
+    case 'GEMINI_RATE_LIMIT':
+      return 'Too many requests right now. Please wait a moment and try again.';
+    case 'GEMINI_QUOTA_EXCEEDED':
+      return 'The guest service has reached its usage quota. Please try again later or use BYOK.';
+    case 'GEMINI_SAFETY_BLOCK':
+      return 'The AI declined to process this content.';
+    case 'GEMINI_SERVICE_UNAVAILABLE':
+      return "Google's AI service is temporarily unavailable. Your material was not saved by Open Study Deck.";
+    case 'SERVER_CONFIGURATION_ERROR':
+      return 'Guest access is temporarily misconfigured. Please use your own Gemini key.';
+    default:
+      return 'Something went wrong. Please try again.';
+  }
+}
+
 // --- Input Tab Navigation ---
 function switchInputTab(tabType) {
   State.activeTab = tabType;
-  
+  trackAnalyticsEvent('input_mode_selected', { input_type: tabType });
+
   if (tabType === 'image') {
     DOM.tabImage.classList.add('active');
     DOM.tabText.classList.remove('active');
@@ -641,7 +970,50 @@ function clearTextArea() {
 }
 
 // --- Gemini Generation Process ---
-async function handleGenerateDeck() {
+
+// Reads and validates the active input tab. Returns null (after showing a
+// toast) if nothing usable was provided; shared by both the guest and BYOK
+// generation paths so validation never drifts between them.
+function gatherGenerationInput() {
+  if (State.activeTab === 'image') {
+    if (!State.uploadedImageBase64) {
+      showToast('Please upload or drag an image containing textbooks/notes.', 'warning');
+      return null;
+    }
+    return {
+      inputType: 'image',
+      sourceContext: `${State.uploadedImageFileName}`,
+      imageBase64: State.uploadedImageBase64,
+      imageMimeType: State.uploadedImageMimeType
+    };
+  }
+
+  const rawText = DOM.textInputField.value.trim();
+  if (!rawText) {
+    showToast('Please paste notes or textbook excerpts in the text workstation.', 'warning');
+    DOM.textInputField.focus();
+    return null;
+  }
+  return {
+    inputType: 'text',
+    sourceContext: rawText.length > 30 ? rawText.substring(0, 27) + '...' : rawText,
+    text: rawText
+  };
+}
+
+function handleGenerateDeck() {
+  const checkedMode = document.querySelector('input[name="study-mode"]:checked');
+  State.selectedMode = checkedMode ? checkedMode.value : 'summary';
+
+  if (State.accessMode === 'guest') {
+    handleGuestGeneration();
+  } else {
+    handleByokGeneration();
+  }
+}
+
+// --- BYOK generation: browser -> Google Gemini directly ---
+async function handleByokGeneration() {
   if (!State.apiKey) {
     showToast('API Key is missing. Configure it in settings or the top right corner.', 'error');
     // Open API modal directly for them to configure
@@ -652,85 +1024,202 @@ async function handleGenerateDeck() {
     }, 300);
     return;
   }
-  
-  let sourceContext = '';
-  let payloadObject = null;
-  
-  if (State.activeTab === 'image') {
-    if (!State.uploadedImageBase64) {
-      showToast('Please upload or drag an image containing textbooks/notes.', 'warning');
-      return;
-    }
-    payloadObject = {
-      inlineData: {
-        data: State.uploadedImageBase64,
-        mimeType: State.uploadedImageMimeType
-      }
-    };
-    sourceContext = `${State.uploadedImageFileName}`;
-  } else {
-    const rawText = DOM.textInputField.value.trim();
-    if (!rawText) {
-      showToast('Please paste notes, textbooks excerpts, or links in the text workstation.', 'warning');
-      DOM.textInputField.focus();
-      return;
-    }
-    payloadObject = rawText;
-    sourceContext = rawText.length > 30 ? rawText.substring(0, 27) + '...' : rawText;
-  }
-  
-  const checkedMode = document.querySelector('input[name="study-mode"]:checked');
-  State.selectedMode = checkedMode ? checkedMode.value : 'summary';
-  
-  const { schema, systemInstruction, userPrompt } = getModeConfig(State.selectedMode, State.focusSubjectContext);
-  
+
+  const input = gatherGenerationInput();
+  if (!input) return;
+
+  const payloadObject = input.inputType === 'image'
+    ? { inlineData: { data: input.imageBase64, mimeType: input.imageMimeType } }
+    : input.text;
+
+  const { schema, systemInstruction, userPrompt } = buildModeConfig(State.selectedMode, State.focusSubjectContext);
+
+  trackAnalyticsEvent('generation_started', { access_mode: 'byok', study_mode: State.selectedMode, input_type: input.inputType });
   setGenerationLoadingState(true);
-  
+
   try {
     const ai = new GoogleGenAI({ apiKey: State.apiKey });
     const contents = [payloadObject, userPrompt];
     const response = await executeWithFallback(ai, State.selectedModel, contents, schema, systemInstruction);
     const parsedData = JSON.parse(response.text);
-    
+
     const deckRecord = {
       id: 'deck_' + Date.now(),
       title: parsedData.title || 'Untitled Study Deck',
-      subtitle: parsedData.subtitle || `Source: ${sourceContext}`,
+      subtitle: parsedData.subtitle || `Source: ${input.sourceContext}`,
       mode: State.selectedMode,
       data: parsedData,
-      sourceType: State.activeTab,
+      sourceType: input.inputType,
+      accessMode: 'byok',
       timestamp: Date.now()
     };
-    
+
     State.history.unshift(deckRecord);
     saveHistory();
     loadDeck(deckRecord.id);
-    
+
     showToast('Study Card generated successfully!', 'success');
+    trackAnalyticsEvent('generation_succeeded', { access_mode: 'byok', study_mode: State.selectedMode, input_type: input.inputType });
   } catch (err) {
     console.error('Gemini API Error:', err);
     let errorMsg = 'Failed to analyze contents. ';
-    
+    let failureCategory = 'unknown';
+
     if (err.message) {
       if (err.message.includes('API key') || err.message.includes('400')) {
         errorMsg += 'Invalid API Key. Please verify settings.';
+        failureCategory = 'invalid_key';
       } else if (err.message.includes('Quota') || err.message.includes('429')) {
         errorMsg += 'Request limit exceeded. Please wait a minute before retrying.';
+        failureCategory = 'quota';
       } else {
         errorMsg += err.message;
       }
     } else {
       errorMsg += 'Network failure or API server error.';
+      failureCategory = 'network';
     }
-    
+
     showToast(errorMsg, 'error', 6000);
-    
+    trackAnalyticsEvent('generation_failed', { access_mode: 'byok', failure_category: failureCategory });
+
     if (!State.activeDeckId) {
       setEmptyState();
     } else {
       loadDeck(State.activeDeckId);
     }
   } finally {
+    setGenerationLoadingState(false);
+  }
+}
+
+// --- Guest generation: browser -> Open Study Deck Cloudflare Function -> Google Gemini ---
+async function handleGuestGeneration() {
+  if (!State.guestConfigLoaded) {
+    showToast('Checking guest availability — please try again in a moment.', 'info');
+    return;
+  }
+  if (!State.guestConfig.guestModeEnabled || !State.guestConfig.turnstileSiteKey) {
+    showToast('Guest access is not available on this deployment. Please switch to "Use My Own Key".', 'error', 6000);
+    return;
+  }
+
+  const input = gatherGenerationInput();
+  if (!input) return;
+
+  if (input.inputType === 'text' && input.text.length > MAX_TEXT_INPUT_LENGTH) {
+    showToast(`Guest text input is limited to ${MAX_TEXT_INPUT_LENGTH.toLocaleString()} characters. Please shorten it or use BYOK.`, 'warning');
+    return;
+  }
+
+  if (input.inputType === 'image') {
+    if (!ALLOWED_IMAGE_MIME_TYPES.includes(input.imageMimeType)) {
+      showToast('That image type is not supported for guest access. Use JPEG, PNG, or WebP.', 'warning');
+      return;
+    }
+    const approxBytes = Math.floor((input.imageBase64.length * 3) / 4);
+    if (approxBytes > MAX_GUEST_IMAGE_BYTES) {
+      showToast('Your image is too large for guest access. Compress it or use BYOK mode.', 'warning');
+      return;
+    }
+  }
+
+  if (!State.turnstileToken) {
+    if (DOM.guestStatusMessage) {
+      DOM.guestStatusMessage.textContent = 'Please complete the verification challenge above before generating.';
+      DOM.guestStatusMessage.classList.add('is-error');
+    }
+    showToast('Please complete the verification challenge, then try again.', 'warning');
+    return;
+  }
+
+  const requestBody = {
+    mode: State.selectedMode,
+    inputType: input.inputType,
+    subjectContext: State.focusSubjectContext,
+    turnstileToken: State.turnstileToken
+  };
+  if (input.inputType === 'image') {
+    requestBody.image = { data: input.imageBase64, mimeType: input.imageMimeType };
+  } else {
+    requestBody.text = input.text;
+  }
+
+  trackAnalyticsEvent('generation_started', { access_mode: 'guest', study_mode: State.selectedMode, input_type: input.inputType });
+  setGenerationLoadingState(true);
+
+  try {
+    const res = await fetch('/api/generate-study-deck', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(requestBody)
+    });
+
+    const payload = await res.json().catch(() => null);
+
+    if (!res.ok || !payload || !payload.data) {
+      const code = (payload && payload.error && payload.error.code) || 'UNKNOWN_ERROR';
+      const extra = (payload && payload.error) || {};
+      const message = guestErrorToUserMessage(code, extra);
+
+      showToast(message, 'error', 6000);
+      trackAnalyticsEvent('generation_failed', { access_mode: 'guest', failure_category: mapGuestErrorToFailureCategory(code) });
+
+      if (code === 'GUEST_DAILY_LIMIT_REACHED') {
+        State.guestUsageRemaining = 0;
+        trackAnalyticsEvent('guest_quota_exhausted', {});
+      }
+      if (DOM.guestStatusMessage) {
+        DOM.guestStatusMessage.textContent = message;
+        DOM.guestStatusMessage.classList.add('is-error');
+      }
+      syncAccessModeUI();
+
+      if (!State.activeDeckId) {
+        setEmptyState();
+      } else {
+        loadDeck(State.activeDeckId);
+      }
+      return;
+    }
+
+    const parsedData = payload.data;
+    const deckRecord = {
+      id: 'deck_' + Date.now(),
+      title: parsedData.title || 'Untitled Study Deck',
+      subtitle: parsedData.subtitle || `Source: ${input.sourceContext}`,
+      mode: State.selectedMode,
+      data: parsedData,
+      sourceType: input.inputType,
+      accessMode: 'guest',
+      timestamp: Date.now()
+    };
+
+    State.history.unshift(deckRecord);
+    saveHistory();
+    loadDeck(deckRecord.id);
+
+    if (payload.usage && typeof payload.usage.remaining === 'number') {
+      State.guestUsageRemaining = payload.usage.remaining;
+    }
+    if (DOM.guestStatusMessage) {
+      DOM.guestStatusMessage.textContent = '';
+      DOM.guestStatusMessage.classList.remove('is-error');
+    }
+    syncAccessModeUI();
+
+    showToast('Study Card generated successfully!', 'success');
+    trackAnalyticsEvent('generation_succeeded', { access_mode: 'guest', study_mode: State.selectedMode, input_type: input.inputType });
+  } catch (err) {
+    showToast('Network error while contacting the guest generation service. Please try again.', 'error', 6000);
+    trackAnalyticsEvent('generation_failed', { access_mode: 'guest', failure_category: 'network' });
+    if (!State.activeDeckId) {
+      setEmptyState();
+    } else {
+      loadDeck(State.activeDeckId);
+    }
+  } finally {
+    resetTurnstileWidget();
     setGenerationLoadingState(false);
   }
 }
@@ -886,125 +1375,6 @@ function loadSavedDeck(deckId) {
   if (studioSec) {
     studioSec.scrollIntoView({ behavior: 'smooth' });
   }
-}
-
-// --- Modes Configs and Prompts ---
-function getModeConfig(mode, academicSubject = '') {
-  const subjectPrefix = academicSubject ? `Focus context specifically on the subject: ${academicSubject}. ` : '';
-  
-  let schema = {};
-  let systemInstruction = '';
-  let userPrompt = '';
-  
-  if (mode === 'summary') {
-    schema = {
-      type: 'object',
-      properties: {
-        title: { type: 'string', description: 'Catchy study card title' },
-        subtitle: { type: 'string', description: 'Brief subject classification' },
-        bullets: {
-          type: 'array',
-          items: {
-            type: 'object',
-            properties: {
-              label: { type: 'string', description: 'Core concept term (2-5 words max)' },
-              content: { type: 'string', description: 'Insights detailing the concept (1-2 sentences maximum)' }
-            },
-            required: ['label', 'content']
-          }
-        },
-        takeaway: { type: 'string', description: 'A single high-impact takeaway sentence' }
-      },
-      required: ['title', 'subtitle', 'bullets', 'takeaway']
-    };
-    
-    systemInstruction = `You are a professional educational designer and summarization engine. ${subjectPrefix}Analyze the study source text/image. Generate a high-yield study summary that extracts critical terms. Keep definitions to-the-point. Format output STRICTLY as JSON adhering to the provided schema.`;
-    userPrompt = `Perform a high-yield summary of the uploaded study reference material. Extract between 3 and 5 key concepts. Keep content academic, clear, and educational.`;
-    
-  } else if (mode === 'eli5') {
-    schema = {
-      type: 'object',
-      properties: {
-        title: { type: 'string', description: 'Sleek explanation title' },
-        subtitle: { type: 'string', description: 'Topic context' },
-        analogyTitle: { type: 'string', description: 'Title of the analogy used' },
-        analogy: { type: 'string', description: 'A highly relatable analogy mapping the topic to simple concepts that a 5-year-old understands' },
-        simpleExplanation: { type: 'string', description: 'A explanation of the core mechanics written in simple, clear language without using heavy terminology.' },
-        funFact: { type: 'string', description: 'An engaging, fun, or memorable trivia fact related to the topic.' }
-      },
-      required: ['title', 'subtitle', 'analogyTitle', 'analogy', 'simpleExplanation', 'funFact']
-    };
-    
-    systemInstruction = `You are a master scientific communicator and school tutor. ${subjectPrefix}Analyze the provided study material and translate it into a simple explanation suitable for a child (ELI5 mode). Avoid technical terminology. Adhere strictly to the JSON schema.`;
-    userPrompt = `Explain this concept like I am 5 years old. Use a playful, understandable analogy and clear language.`;
-    
-  } else if (mode === 'notes') {
-    schema = {
-      type: 'object',
-      properties: {
-        title: { type: 'string', description: 'Comprehensive study card outline title' },
-        subtitle: { type: 'string', description: 'Subject classification' },
-        sections: {
-          type: 'array',
-          description: 'A detailed, hierarchical study outline of the material',
-          items: {
-            type: 'object',
-            properties: {
-              header: { type: 'string', description: 'Main concept header (e.g. key phase, topic, or main division)' },
-              subsections: {
-                type: 'array',
-                items: {
-                  type: 'object',
-                  properties: {
-                    subHeader: { type: 'string', description: 'Sub-header diving into a specific subtopic or detail' },
-                    bullets: {
-                      type: 'array',
-                      items: {
-                        type: 'string',
-                        description: 'A comprehensive bullet point detailing a key fact, detail, formula, or concept (1-2 sentences)'
-                      }
-                    }
-                  },
-                  required: ['subHeader', 'bullets']
-                }
-              }
-            },
-            required: ['header', 'subsections']
-          }
-        }
-      },
-      required: ['title', 'subtitle', 'sections']
-    };
-    
-    systemInstruction = `You are a professional academic summarizer and study guide outline compiler. ${subjectPrefix}Analyze the study source text/image. Generate a highly structured, comprehensive, and detailed outline with Main Headers, Sub-Headers, and key bullet points. Do not omit crucial definitions, concepts, or details. Format output STRICTLY as JSON adhering to the provided schema.`;
-    userPrompt = `Perform a comprehensive study outline of the provided study material. Organize it into main conceptual headers (sections), relevant sub-headers (subsections), and key detail bullet points (bullets).`;
-
-  } else { // flashcards
-    schema = {
-      type: 'object',
-      properties: {
-        title: { type: 'string', description: 'Study card deck name' },
-        subtitle: { type: 'string', description: 'Context and scope' },
-        cards: {
-          type: 'array',
-          items: {
-            type: 'object',
-            properties: {
-              question: { type: 'string', description: 'A clear, direct test question testing key principles' },
-              answer: { type: 'string', description: 'The accurate, precise answer (1-2 sentences max)' }
-            },
-            required: ['question', 'answer']
-          }
-        }
-      },
-      required: ['title', 'subtitle', 'cards']
-    };
-    
-    systemInstruction = `You are an academic flashcard creator. ${subjectPrefix}Analyze the material and formulate precise Q&A flashcards for study revisions. Avoid multiple choice. Keep questions clean and answers compact. Adhere strictly to the JSON schema.`;
-    userPrompt = `Extract exactly 4 high-yield Q&A study flashcards from the provided resource. Focus on core details, dates, equations, or processes.`;
-  }
-  
-  return { schema, systemInstruction, userPrompt };
 }
 
 // --- Deck Rendering Engine ---
@@ -1184,14 +1554,6 @@ function loadDeck(deckId) {
   }
 }
 
-function getModeLabel(mode) {
-  if (mode === 'summary') return 'Summary Bullets';
-  if (mode === 'eli5') return 'ELI5 Simplification';
-  if (mode === 'notes') return 'Detailed Outline';
-  if (mode === 'flashcards') return 'Q&A Flashcards';
-  return 'Study Deck';
-}
-
 function handleDeleteHistoryItem(id) {
   State.history = State.history.filter(item => item.id !== id);
   saveHistory();
@@ -1256,8 +1618,9 @@ async function exportElementToPng(targetElement, title, mode) {
     document.body.appendChild(downloadLink);
     downloadLink.click();
     document.body.removeChild(downloadLink);
-    
+
     showToast('PNG Card exported successfully!', 'success');
+    trackAnalyticsEvent('deck_exported', { export_type: 'png', study_mode: mode });
   } catch (err) {
     console.error('HTML2Canvas export failed:', err);
     showToast('Export failed. Please try again.', 'error');
@@ -1387,8 +1750,9 @@ function handleTextDownload() {
   downloadLink.click();
   document.body.removeChild(downloadLink);
   URL.revokeObjectURL(url);
-  
+
   showToast('Text Document exported successfully!', 'success');
+  trackAnalyticsEvent('deck_exported', { export_type: 'markdown', study_mode: activeDeck.mode });
 }
 
 // --- Modal Handlers ---
@@ -1401,12 +1765,9 @@ function initModalHandlers() {
   // Open Triggers
   document.getElementById('api-modal-trigger').addEventListener('click', () => {
     apiModal.style.display = 'flex';
-    // Load local storage value fresh into modal input
+    syncApiKeyUI();
     const modalInput = document.getElementById('api-key-input-modal');
-    if (modalInput) {
-      modalInput.value = State.apiKey;
-      modalInput.focus();
-    }
+    if (modalInput) modalInput.focus();
   });
   
   document.getElementById('support-modal-trigger').addEventListener('click', () => {

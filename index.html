@@ -1,36 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-LTBKKM734X"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-
-    gtag('config', 'G-LTBKKM734X');
-  </script>
-
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Open Study Deck | Privacy-First AI Study Card Studio</title>
   
   <!-- SEO & Social Meta Tags -->
-  <meta name="description" content="A privacy-first, zero-paywall AI study card studio. Generate high-fidelity flashcards, simple explanations, detailed outlines, and summaries from textbooks, notes, or links using Google Gemini API locally.">
+  <meta name="description" content="A privacy-conscious, zero-paywall AI study card studio. Generate high-fidelity flashcards, simple explanations, detailed outlines, and summaries from textbooks or notes using your own Google Gemini API key.">
   <meta name="keywords" content="flashcards, study app, AI flashcards, Gemini API, textbook summarizer, privacy first study, local study cards, AI Flashcard Generator from Image, convert picture to flashcards online, photo to study notes converter, textbook screenshot summarizer ai, study deck, open study deck, visual study cards, free flashcard maker, export flashcards as PNG, active recall app, spaced repetition maker, client-side flashcards, digital study deck, visual study card maker">
   <link rel="canonical" href="https://openstudydeck.com/">
   <meta name="robots" content="index, follow">
 
   <!-- Open Graph / Facebook -->
   <meta property="og:title" content="Open Study Deck | Privacy-First AI Study Card Studio">
-  <meta property="og:description" content="Generate beautiful, exportable digital flashcards, detailed outlines, and summaries from notes or links with your own Gemini API key. Zero SaaS paywalls.">
+  <meta property="og:description" content="Generate beautiful, exportable digital flashcards, detailed outlines, and summaries from your notes with your own Gemini API key. Zero SaaS paywalls.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://openstudydeck.com/">
 
   <!-- Twitter Cards -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Open Study Deck | Privacy-First AI Study Card Studio">
-  <meta name="twitter:description" content="Generate high-fidelity study cards, detailed outlines, and summaries from notes or links with your own Gemini API key. Zero SaaS paywalls.">
+  <meta name="twitter:description" content="Generate high-fidelity study cards, detailed outlines, and summaries from your notes with your own Gemini API key. Zero SaaS paywalls.">
 
   <!-- Schema.org JSON-LD Structured Data for WebApplication -->
   <script type="application/ld+json">
@@ -39,7 +29,7 @@
     "@type": "WebApplication",
     "name": "Open Study Deck",
     "url": "https://openstudydeck.com/",
-    "description": "A privacy-first, zero-paywall AI study card studio. Generate digital active-recall flashcards, simple explanations (ELI5), detailed outlines, and outlines from textbooks, screenshots, or notes using the Google Gemini API locally in your browser.",
+    "description": "A privacy-conscious, zero-paywall AI study card studio. Generate digital active-recall flashcards, simple explanations (ELI5), detailed outlines, and summaries from textbooks, screenshots, or notes. Runs in your browser and sends content directly to the Google Gemini API using your own API key.",
     "applicationCategory": "EducationalApplication",
     "operatingSystem": "All",
     "browserRequirements": "Requires JavaScript. Requires HTML5.",
@@ -53,7 +43,7 @@
       "Convert picture to flashcards online",
       "Textbook screenshot summarizer AI",
       "Photo to study notes converter",
-      "Privacy-first local processing",
+      "Browser-first, no account database",
       "Export flashcards as PNG"
     ]
   }
@@ -77,6 +67,7 @@
   
   <!-- Back to Top Button Component -->
   <script type="module" src="back-to-top.js"></script>
+  <script type="module" src="analytics-consent.js"></script>
   
   <!-- HTML2Canvas library (captures advanced styling and layouts cleanly) -->
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js" defer></script>
@@ -185,8 +176,8 @@
         <!-- Center hero logo removed; handled by top-left animated branding -->
         <!-- Placeholder for mobile logo positioning at scrollY = 0 -->
         <div class="mobile-logo-placeholder" id="mobile-logo-placeholder"></div>
-        <h1 class="hero-title">Zero Paywalls. Privacy-First.<br>Your local study studio.</h1>
-        <p class="hero-subtitle">Bypass SaaS subscriptions by bringing your own Gemini API key. Convert notes, textbooks, and resources into beautifully styled, exportable study cards locally inside your browser.</p>
+        <h1 class="hero-title">Zero Paywalls. Privacy-Conscious.<br>Your browser-first study studio.</h1>
+        <p class="hero-subtitle">Try it instantly with no API key (limited free guest generations), or bring your own Gemini key for extra quota. Convert notes, textbooks, and resources into beautifully styled, exportable study cards.</p>
         
         <div class="hero-actions">
           <a href="#studio-section" class="btn btn-primary btn-hero">Launch Workstation</a>
@@ -209,7 +200,7 @@
       <div class="hero-features-strip">
         <div class="feat-badge">NO Signups</div>
         <div class="feat-badge">NO Database</div>
-        <div class="feat-badge">100% Client-Side</div>
+        <div class="feat-badge">Browser-First Interface</div>
       </div>
     </header>
 
@@ -227,6 +218,34 @@
           
           <!-- LEFT SIDE: INPUT WORKSTATION -->
           <div class="workspace-card input-card">
+            <div class="access-mode-container">
+              <label class="section-label">Access Mode</label>
+              <div class="access-mode-grid">
+                <label class="access-mode-card" for="access-mode-guest">
+                  <input type="radio" name="access-mode" id="access-mode-guest" value="guest" checked aria-describedby="guest-status-message">
+                  <div class="access-mode-card-content">
+                    <span class="access-mode-title">Guest Access</span>
+                    <span class="access-mode-desc">Try Open Study Deck without configuring an API key. Guest generations are limited to protect the free service.</span>
+                  </div>
+                </label>
+                <label class="access-mode-card" for="access-mode-byok">
+                  <input type="radio" name="access-mode" id="access-mode-byok" value="byok">
+                  <div class="access-mode-card-content">
+                    <span class="access-mode-title">Use My Own Key</span>
+                    <span class="access-mode-desc">Use your personal Gemini API quota for additional generations and direct browser-to-Google requests.</span>
+                  </div>
+                </label>
+              </div>
+
+              <div class="guest-panel" id="guest-panel">
+                <div class="guest-quota-row">
+                  <span class="guest-quota-text" id="guest-quota-text" role="status" aria-live="polite">Checking guest availability…</span>
+                </div>
+                <div id="turnstile-container" class="turnstile-container"></div>
+                <p class="guest-status-message" id="guest-status-message" role="status" aria-live="polite"></p>
+              </div>
+            </div>
+
             <div class="tab-control">
               <button class="tab-btn active" id="tab-image" data-target="image-workplace">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
@@ -242,7 +261,7 @@
                   <polyline points="14 2 14 8 20 8"></polyline>
                   <line x1="16" y1="13" x2="8" y2="13"></line>
                 </svg>
-                Text / Web Links
+                Paste Text
               </button>
             </div>
 
@@ -275,7 +294,7 @@
             <!-- Text/Link Area -->
             <div class="workplace-section" id="text-workplace">
               <div class="text-input-wrapper">
-                <textarea id="text-input-field" placeholder="Paste notes, textbook paragraphs, code snippets, or paste web links containing learning resources..."></textarea>
+                <textarea id="text-input-field" placeholder="Paste notes, textbook paragraphs, or code snippets..."></textarea>
                 <div class="textarea-footer">
                   <span class="char-counter" id="char-counter">0 characters</span>
                   <button type="button" class="btn-clear-textarea" id="btn-clear-text" style="display: none;">Clear</button>
@@ -360,6 +379,7 @@
                       <option value="gemini-1.5-flash">gemini-1.5-flash (Legacy Fast)</option>
                       <option value="gemini-3.5-flash">gemini-3.5-flash (Experimental)</option>
                     </select>
+                    <p class="form-hint" id="model-selector-guest-note" style="display: none;">Guest generations use the service's current optimized model.</p>
                   </div>
                   <div class="form-group">
                     <label for="system-context-input">Academic Subject Context</label>
@@ -452,7 +472,7 @@
                       </svg>
                     </div>
                     <h3>Your Study Deck Awaits</h3>
-                    <p>Enter your Gemini API key in the settings panel below, select study details, and hit "Analyze & Generate".</p>
+                    <p>Choose Guest Access or your own Gemini key above, select study details, and hit "Analyze & Generate".</p>
                   </div>
 
                   <!-- Skeletal Loading State -->
@@ -544,15 +564,15 @@
           <!-- Box 1: Key Management -->
           <div class="settings-card api-card-highlight flex-col">
             <h3 class="settings-card-title">Gemini API Key</h3>
-            <p class="settings-card-text">Your API key is saved locally. It is only used to connect directly to official Google servers.</p>
-            
+            <p class="settings-card-text" id="api-key-guidance">Your key is used by this browser to call Google Gemini directly. Open Study Deck does not send it to its own server.</p>
+
             <div class="api-status-badge" id="api-status">
               <span class="status-dot dot-red"></span>
               <span class="status-text">Key Required</span>
             </div>
 
             <div class="input-with-icon">
-              <input type="password" id="api-key-input" placeholder="AIzaSy..." autocomplete="off" aria-label="Google Gemini API Key">
+              <input type="password" id="api-key-input" placeholder="AIzaSy..." autocomplete="off" aria-label="Google Gemini API Key" aria-describedby="api-key-guidance api-key-remember-warning">
               <button class="icon-toggle-btn toggle-key-visibility-class" data-target-input="api-key-input" type="button" title="Toggle Visibility">
                 <svg class="icon-eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
                   <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
@@ -561,8 +581,15 @@
               </button>
             </div>
 
+            <div class="remember-key-row">
+              <input type="checkbox" id="remember-key-checkbox" class="remember-key-checkbox-class" aria-describedby="api-key-remember-warning">
+              <label for="remember-key-checkbox">Remember this key on this device</label>
+            </div>
+            <p class="settings-card-text remember-key-warning" id="api-key-remember-warning" style="display: none;">Only remember your key on a trusted personal device. Browser extensions or scripts running on this site may technically access browser storage.</p>
+            <p class="settings-card-text api-key-storage-note-class" id="api-key-storage-note"></p>
+
             <div class="settings-actions">
-              <button class="btn btn-primary btn-save-key-class" data-source-input="api-key-input">Save Key</button>
+              <button class="btn btn-primary btn-save-key-class" data-source-input="api-key-input" data-remember-checkbox="remember-key-checkbox">Save Key</button>
               <button class="btn btn-secondary btn-clear-key-class">Clear Key</button>
             </div>
           </div>
@@ -589,7 +616,7 @@
           <!-- Box 3: Privacy & About -->
           <div class="settings-card span-2 flex-col">
             <h3 class="settings-card-title">Security & Privacy Statement</h3>
-            <p class="settings-card-text">Open Study Deck operates fully under the <strong>Bring Your Own Key (BYOK)</strong> architecture. Unlike standard study apps, there are <strong>no login forms, no subscription plans, and no analytical trackers</strong>. All image text parsing and card generations are triggered from your own web client directly to Google API interfaces. Your learning documents and API codes stay on your local disk.</p>
+            <p class="settings-card-text">Open Study Deck offers two ways to generate decks: <strong>Guest Access</strong>, which routes your request through Open Study Deck's own Cloudflare Function to a shared Gemini credential (no key required, limited daily generations), and <strong>Bring Your Own Key (BYOK)</strong>, which sends requests from your browser directly to Google Gemini using your personal key. In both modes there are <strong>no login forms and no subscription plans</strong>, and Open Study Deck does not retain your study content, generated decks, or (in BYOK mode) your API key on its own servers. Open Study Deck uses consent-based Google Analytics to understand aggregate feature usage &mdash; it only loads if you allow it, and study content, generated answers, and API keys are never sent as analytics data. Your study decks and preferences stay in your browser's local storage.</p>
             
             <hr class="card-divider">
 
@@ -632,10 +659,10 @@
             Escape the Paywalls: The Democratic Study Revolution
           </h2>
           <p class="text-lg leading-relaxed text-slate-600 dark:text-slate-300">
-            Let&apos;s be honest: college is stressful enough without study apps charging you to learn your own notes. You are drowning in 80-page slide decks, tiny font textbooks, and late-night cram sessions. Yet, every popular study tool blocks your learning behind a paywall. Meet Open Study Deck, the ultimate <strong>free alternative to AI study apps</strong>. We built this because you shouldn&apos;t have to pay a monthly subscription just to study efficiently. Powered by your own local API, our platform features a next-generation <strong>AI Flashcard Generator from Image</strong> that instantly transforms flat slides and textbook pages into active-recall study guides, without charging you a single dime. No paywalls, no subscription limits—just pure, unadulterated learning.
+            Let&apos;s be honest: college is stressful enough without study apps charging you to learn your own notes. You are drowning in 80-page slide decks, tiny font textbooks, and late-night cram sessions. Yet, every popular study tool blocks your learning behind a paywall. Meet Open Study Deck, the ultimate <strong>free alternative to AI study apps</strong>. We built this because you shouldn&apos;t have to pay a monthly subscription just to study efficiently. Powered by your own Gemini API key, our platform features a next-generation <strong>AI Flashcard Generator from Image</strong> that transforms flat slides and textbook pages into active-recall study guides, without charging you a single dime. No paywalls, no Open Study Deck subscription—just pure, unadulterated learning.
           </p>
           <p class="text-base leading-relaxed text-slate-600 dark:text-slate-300">
-            Visual learning is highly effective, but manually preparing flashcards is a major time sink. Copying text, formatting layouts, and finding screenshots takes hours. By building a local studio workspace, we automate flashcard creation. This browser-based app functions as a client-side study card creator, extracting definitions, charts, and summaries from your documents instantly. By shifting compilation to the user&apos;s browser, we bypass cloud subscription paywalls entirely, providing unlimited access for students worldwide.
+            Visual learning is highly effective, but manually preparing flashcards is a major time sink. Copying text, formatting layouts, and finding screenshots takes hours. By building a browser-first studio workspace, we automate flashcard creation. This app functions as a client-side study card creator: it renders your cards in the browser and sends your content to Google Gemini for analysis. By shifting the interface to the browser, we bypass cloud subscription paywalls entirely, keeping the tool free for students worldwide.
           </p>
         </div>
 
@@ -645,13 +672,13 @@
             How It Works: The BYOK (Bring Your Own Key) Advantage
           </h3>
           <p class="text-base leading-relaxed text-slate-600 dark:text-slate-300">
-            We do things differently. Instead of locking features behind pricing tiers, Open Study Deck operates on a &quot;Bring Your Own Key&quot; (BYOK) architecture. By hooking up a free Gemini API key directly from Google AI Studio, you unlock a powerful, <strong>unlimited ai text summarizer no signup</strong> required.
+            We do things differently. Instead of locking features behind pricing tiers, Open Study Deck operates on a &quot;Bring Your Own Key&quot; (BYOK) architecture. By hooking up a free Gemini API key directly from Google AI Studio, you unlock a powerful <strong>AI text summarizer with no Open Study Deck signup</strong> required. Usage is subject to the quota, rate limits, and billing configuration of your own Google AI project &mdash; not an Open Study Deck limit.
           </p>
           <p class="text-base leading-relaxed text-slate-600 dark:text-slate-300">
-            Here is why this matters: most study platforms upload your files to their servers, tracking your study habits and charging you when you hit a usage ceiling. Open Study Deck is a <strong>privacy first ai flashcard generator</strong>. Everything happens directly inside your web browser. Your notes, textbook uploads, and generated flashcards remain stored locally on your device. Zero external databases, zero tracking, and absolute data privacy. You get direct, unthrottled access to industry-grade AI models without giving up your email address or your credit card. No third parties ever see your coursework.
+            Here is why this matters: most study platforms upload your files to their own servers, storing and sometimes tracking your study habits behind a usage ceiling. Open Study Deck is a <strong>privacy-conscious ai flashcard generator</strong>: the interface runs directly inside your web browser, and there is no Open Study Deck account database or deck-storage backend. Your notes, textbook uploads, and generated flashcards stay in your browser&apos;s local storage. To generate a card, the text or image you submit is sent directly from your browser to Google Gemini for processing &mdash; that is how the AI analysis happens. You never give up an email address or a credit card to use the tool.
           </p>
           <p class="text-base leading-relaxed text-slate-600 dark:text-slate-300">
-            All file processing, OCR parsing, and layout rendering occur locally inside your browser&apos;s viewport. Your Google Gemini API key is stored securely in your browser&apos;s persistent LocalStorage cache. It never leaves your machine. The queries are sent securely via HTTPS directly to Google&apos;s API endpoints. There are no registration databases, no tracking systems, and no analytical dashboards monitoring your study habits. This client-side execution model guarantees absolute privacy for your academic work and textbook screenshots, ensuring your credentials and study data remain completely under your control.
+            Card rendering and PNG export happen locally inside your browser&apos;s viewport. By default, your Google Gemini API key is kept only in your browser&apos;s session storage for the current tab; if you opt in to &quot;Remember this key on this device,&quot; it is saved in your browser&apos;s local storage instead so it persists across visits. Either way, the key is used only to authenticate requests you send straight to Google&apos;s API endpoints over HTTPS &mdash; Open Study Deck has no backend that receives or logs it. There is no Open Study Deck account database or analytics dashboard tracking your study habits.
           </p>
         </div>
 
@@ -717,7 +744,7 @@
             The Smartest, Free Online AI Flashcard Maker
           </h3>
           <p class="text-base leading-relaxed text-slate-600 dark:text-slate-300">
-            Whether you are preparing for medical boards, analyzing legal case files, or trying to survive organic chemistry, you need tools that keep up with your pace. With Open Study Deck, you can <strong>scan notes to flashcards ai</strong> all day long, completely free of SaaS limits. No more hitting daily usage caps right before a midterm. No more premium subscription popups when you are in the zone.
+            Whether you are preparing for medical boards, analyzing legal case files, or trying to survive organic chemistry, you need tools that keep up with your pace. With Open Study Deck, you can <strong>scan notes to flashcards ai</strong> without an Open Study Deck subscription or paywall. No premium popups interrupting your session &mdash; just the quota and rate limits that come with your own Google AI project.
           </p>
           <p class="text-base leading-relaxed text-slate-600 dark:text-slate-300">
             We refuse to gatekeep education. Open Study Deck was built by self-learners who got tired of subscription fees getting in the way of knowledge. By putting you in charge of your own API access, we guarantee that this visual study studio will remain a zero-cost workspace for all students forever.
@@ -766,7 +793,24 @@
                 </span>
               </summary>
               <p class="mt-4 leading-relaxed text-slate-600 dark:text-slate-400 text-base">
-                Open Study Deck is a privacy-first, free visual study card tool designed for high schoolers, university students, and self-learners dealing with massive reading volumes. It operates entirely client-side, using your browser capabilities and the Gemini API to instantly transform textbook screenshots, notes, or web links into styled active-recall decks.
+                Open Study Deck is a privacy-conscious, free visual study card tool designed for high schoolers, university students, and self-learners dealing with massive reading volumes. It runs in your browser and uses the Google Gemini API to transform textbook screenshots, notes, or pasted text into styled active-recall decks. You can try it instantly with <strong>Guest Access</strong> (no API key, limited daily generations) or connect your own Gemini key with <strong>BYOK</strong> for additional quota.
+              </p>
+            </details>
+
+            <details class="group border border-slate-200 dark:border-slate-800 rounded-xl bg-white dark:bg-slate-900/50 p-6 [&_summary::-webkit-details-marker]:hidden transition-all duration-300">
+              <summary class="flex cursor-pointer items-center justify-between gap-1.5 text-slate-900 dark:text-white font-semibold text-lg select-none">
+                <span>How does Guest Access work, and what happens to my content?</span>
+                <span class="relative size-5 shrink-0">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="absolute inset-0 size-5 opacity-100 group-open:opacity-0 transition-opacity duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <svg xmlns="http://www.w3.org/2000/svg" class="absolute inset-0 size-5 opacity-0 group-open:opacity-100 transition-opacity duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </span>
+              </summary>
+              <p class="mt-4 leading-relaxed text-slate-600 dark:text-slate-400 text-base">
+                Guest Access lets you generate a limited number of study decks per day without configuring anything. Your text or image is sent from your browser to Open Study Deck's own Cloudflare Function, which forwards it to Google Gemini using a shared service credential and returns the result. Open Study Deck does not intentionally retain your submitted content or the generated deck &mdash; it is not saved in any Open Study Deck database. A small piece of hashed, non-reversible usage data is kept temporarily just to enforce the daily guest limit; your raw IP address is never stored. Guest generations are protected by Cloudflare Turnstile to prevent automated abuse.
               </p>
             </details>
 
@@ -783,7 +827,7 @@
                 </span>
               </summary>
               <p class="mt-4 leading-relaxed text-slate-600 dark:text-slate-400 text-base">
-                There is no catch. Instead of locking features behind monthly subscription paywalls, Open Study Deck operates on a "Bring Your Own Key" (BYOK) model. We offer this as a fully functional <strong>free alternative to AI study apps</strong> that gatekeep learning. By linking your own free API key directly from Google AI Studio, you bypass middleman servers and use unthrottled AI endpoints completely for free.
+                There is no catch. Instead of locking features behind monthly subscription paywalls, Open Study Deck operates on a "Bring Your Own Key" (BYOK) model. We offer this as a fully functional <strong>free alternative to AI study apps</strong> that gatekeep learning. By linking your own free API key directly from Google AI Studio, you bypass middleman servers and use Gemini directly &mdash; subject to whatever quota and rate limits apply to your own Google AI project.
               </p>
             </details>
           </div>
@@ -807,7 +851,7 @@
                 </span>
               </summary>
               <div class="mt-4 leading-relaxed text-slate-600 dark:text-slate-400 text-base space-y-2">
-                <p>Obtaining a key takes under a minute, needs no credit card, and ensures an <strong>unlimited ai text summarizer no signup</strong> is required on our platform:</p>
+                <p>Obtaining a key takes under a minute, needs no credit card, and unlocks an <strong>ai text summarizer with no Open Study Deck signup</strong> required:</p>
                 <ol class="list-decimal pl-5 space-y-1 font-medium">
                   <li>Navigate to the official <a href="https://aistudio.google.com/" target="_blank" rel="noopener" class="text-sky-500 hover:underline">Google AI Studio</a> page.</li>
                   <li>Sign in with any standard Google account and click the blue <strong>"Get API Key"</strong> button on the sidebar.</li>
@@ -819,7 +863,7 @@
 
             <details class="group border border-slate-200 dark:border-slate-800 rounded-xl bg-white dark:bg-slate-900/50 p-6 [&_summary::-webkit-details-marker]:hidden transition-all duration-300">
               <summary class="flex cursor-pointer items-center justify-between gap-1.5 text-slate-900 dark:text-white font-semibold text-lg select-none">
-                <span>Do I have to generate a new API key every time I visit the site?</span>
+                <span>Do I have to re-enter my API key every time I visit the site?</span>
                 <span class="relative size-5 shrink-0">
                   <svg xmlns="http://www.w3.org/2000/svg" class="absolute inset-0 size-5 opacity-100 group-open:opacity-0 transition-opacity duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -830,7 +874,7 @@
                 </span>
               </summary>
               <p class="mt-4 leading-relaxed text-slate-600 dark:text-slate-400 text-base">
-                No. Open Study Deck automatically stores your API key locally in your browser's persistent LocalStorage cache. It acts as a "set it and forget it" integration, so your key remains ready for use every time you reopen the site on this physical machine.
+                By default, no re-typing is needed within the same browser tab: your key is held in session storage for that tab. If you want it to survive closing the browser and coming back later, check "Remember this key on this device" when you save it &mdash; that stores the key in your browser's local storage on this machine instead. Leave that box unchecked on shared or public computers.
               </p>
             </details>
 
@@ -847,7 +891,7 @@
                 </span>
               </summary>
               <p class="mt-4 leading-relaxed text-slate-600 dark:text-slate-400 text-base">
-                Yes. The same Google Gemini API key works flawlessly across your laptop, tablet, and mobile phone. However, because Open Study Deck is a serverless application that does not host your credentials in a cloud database (ensuring complete security), you will need to copy and paste the key once into the Settings tab of each individual web browser you use.
+                Yes. The same Google Gemini API key works across your laptop, tablet, and mobile phone. Because Open Study Deck does not host your credentials in a cloud database, there is no account to sync &mdash; you'll need to copy and paste the key into the Settings tab of each individual web browser you use.
               </p>
             </details>
 
@@ -864,7 +908,7 @@
                 </span>
               </summary>
               <p class="mt-4 leading-relaxed text-slate-600 dark:text-slate-400 text-base">
-                Your key will only clear if you run the site inside an Incognito / Private window (which drops LocalStorage on tab close), if you manually clear your browser cookies and site memory, or if you select the "Clear Key" button inside the Settings panel.
+                If you haven't checked "Remember this key on this device," your key lives in session storage and clears when you close the browser tab (or the whole browser, depending on your settings) &mdash; you'll need to paste it again next visit. If you did check that box, the key persists in local storage until you clear your browser's site data or click "Clear Key" in the Settings panel.
               </p>
             </details>
           </div>
@@ -888,7 +932,24 @@
                 </span>
               </summary>
               <p class="mt-4 leading-relaxed text-slate-600 dark:text-slate-400 text-base">
-                Your key is completely safe. Open Study Deck is a serverless, <strong>privacy first ai flashcard generator</strong>. We do not have database servers, logins, or trackers. Your key is stored in your private browser memory and queries Google’s APIs directly via encrypted HTTPS connections. We cannot see, access, or log your credentials.
+                In BYOK mode, your key never touches an Open Study Deck server &mdash; it lives in your browser's session or local storage and is used to query Google's APIs directly over encrypted HTTPS. In Guest Access, there is no personal key at all; requests use a shared credential held only in Open Study Deck's server-side configuration, which the browser never receives. As with any browser-stored secret, keep in mind that browser extensions or scripts running on a compromised device could technically read a BYOK key &mdash; only enable "Remember this key" on a device you trust.
+              </p>
+            </details>
+
+            <details class="group border border-slate-200 dark:border-slate-800 rounded-xl bg-white dark:bg-slate-900/50 p-6 [&_summary::-webkit-details-marker]:hidden transition-all duration-300">
+              <summary class="flex cursor-pointer items-center justify-between gap-1.5 text-slate-900 dark:text-white font-semibold text-lg select-none">
+                <span>Does Open Study Deck use Google Analytics?</span>
+                <span class="relative size-5 shrink-0">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="absolute inset-0 size-5 opacity-100 group-open:opacity-0 transition-opacity duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <svg xmlns="http://www.w3.org/2000/svg" class="absolute inset-0 size-5 opacity-0 group-open:opacity-100 transition-opacity duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </span>
+              </summary>
+              <p class="mt-4 leading-relaxed text-slate-600 dark:text-slate-400 text-base">
+                Yes, but only with your permission. Open Study Deck uses consent-based Google Analytics to understand aggregate feature usage, such as which study modes are popular and whether generations succeed &mdash; this helps us improve the product. The Analytics script is not requested until you click "Allow Analytics" on the consent banner; declining (or ignoring it) means nothing loads and nothing is sent. We never send your study content, generated answers, filenames, deck titles, subject context, or API keys as analytics data. You can change your decision anytime via the "Analytics Preferences" link in the footer.
               </p>
             </details>
 
@@ -905,7 +966,7 @@
                 </span>
               </summary>
               <p class="mt-4 leading-relaxed text-slate-600 dark:text-slate-400 text-base">
-                Your learning materials stay secure. Textbook screenshots and photos of lecture notes are processed locally in your browser viewport canvas. The image details are passed securely via HTTPS straight to Google to retrieve active summary text, and are never saved or cached on any external server.
+Textbook screenshots and photos of lecture notes are sent over HTTPS to Google Gemini for analysis &mdash; that's how the AI reads and summarizes them. In BYOK mode this goes directly from your browser to Google. In Guest Access it passes through Open Study Deck's Cloudflare Function on the way to Google. In both cases Open Study Deck does not store or cache your images in a database of its own. Once the response comes back, the generated card is rendered and stored only in your browser.
               </p>
             </details>
           </div>
@@ -929,7 +990,7 @@
                 </span>
               </summary>
               <p class="mt-4 leading-relaxed text-slate-600 dark:text-slate-400 text-base">
-                No, you are free of SaaS restriction limits. Under Google’s free-tier Gemini API configuration, your key grants you up to 15 API requests per minute and 1,500 operations per day. This means you can <strong>scan notes to flashcards ai</strong> all day without ever running into credit blocks or subscription limits.
+Guest Access has a modest daily generation limit (shown above the generate button) to keep the free shared service usable for everyone. In BYOK mode, Open Study Deck itself imposes no daily cap or subscription limit &mdash; your usage is instead subject to the model availability, quota, rate limits, and billing configuration of your own Google AI project. Check your project's dashboard in Google AI Studio for your current BYOK limits.
               </p>
             </details>
 
@@ -984,6 +1045,7 @@
           <a href="terms" class="scroll-top-link">Terms & Conditions</a>
           <a href="contact" class="scroll-top-link">Contact Us</a>
           <a href="#faq-section" class="scroll-top-link">FAQ</a>
+          <a href="#" class="scroll-top-link" data-analytics-preferences-trigger>Analytics Preferences</a>
           <a href="#home-section" class="scroll-top-link">Back to Top</a>
         </div>
       </div>
@@ -993,18 +1055,18 @@
 
   <!-- MODAL 1: CONFIGURE API KEY -->
   <div class="modal-overlay" id="api-modal" style="display: none;">
-    <div class="modal-card api-card-highlight">
+    <div class="modal-card api-card-highlight" role="dialog" aria-modal="true" aria-labelledby="api-modal-title">
       <button class="modal-close-btn" id="close-api-modal" aria-label="Close API Key configurations">&times;</button>
-      <h3 class="modal-title">Configure Gemini API Key</h3>
-      <p class="modal-desc">Paste your secret token here. It will be committed securely directly to your local browser storage.</p>
-      
+      <h3 class="modal-title" id="api-modal-title">Configure Gemini API Key</h3>
+      <p class="modal-desc" id="api-key-guidance-modal">Your key is used by this browser to call Google Gemini directly. Open Study Deck does not send it to its own server.</p>
+
       <div class="api-status-badge" id="api-status-modal">
         <span class="status-dot dot-red"></span>
         <span class="status-text">Key Required</span>
       </div>
 
       <div class="input-with-icon">
-        <input type="password" id="api-key-input-modal" placeholder="AIzaSy..." autocomplete="off" aria-label="Google Gemini API Key">
+        <input type="password" id="api-key-input-modal" placeholder="AIzaSy..." autocomplete="off" aria-label="Google Gemini API Key" aria-describedby="api-key-guidance-modal api-key-remember-warning-modal">
         <button class="icon-toggle-btn toggle-key-visibility-class" data-target-input="api-key-input-modal" type="button" title="Toggle Visibility">
           <svg class="icon-eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
             <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
@@ -1013,8 +1075,15 @@
         </button>
       </div>
 
+      <div class="remember-key-row">
+        <input type="checkbox" id="remember-key-checkbox-modal" class="remember-key-checkbox-class" aria-describedby="api-key-remember-warning-modal">
+        <label for="remember-key-checkbox-modal">Remember this key on this device</label>
+      </div>
+      <p class="settings-card-text remember-key-warning" id="api-key-remember-warning-modal" style="display: none;">Only remember your key on a trusted personal device. Browser extensions or scripts running on this site may technically access browser storage.</p>
+      <p class="settings-card-text api-key-storage-note-class" id="api-key-storage-note-modal"></p>
+
       <div class="modal-api-actions">
-        <button class="btn btn-primary btn-save-key-class" data-source-input="api-key-input-modal">Save Key</button>
+        <button class="btn btn-primary btn-save-key-class" data-source-input="api-key-input-modal" data-remember-checkbox="remember-key-checkbox-modal">Save Key</button>
         <button class="btn btn-secondary btn-clear-key-class">Clear Key</button>
       </div>
 

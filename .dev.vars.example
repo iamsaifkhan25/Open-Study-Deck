@@ -1,0 +1,19 @@
+# Local development variables for `wrangler pages dev` (production-parity
+# testing of the real Cloudflare Pages Functions, including KV bindings).
+#
+# Copy this file to `.dev.vars` (already gitignored) and fill in real local
+# values. Never commit `.dev.vars` or put real secrets in this example file.
+#
+# See docs/CLOUDFLARE_GUEST_AI_SETUP.md for full setup instructions,
+# including Cloudflare's official Turnstile testing site/secret key pairs
+# that always pass or always fail — useful here without a real Turnstile
+# widget.
+
+GEMINI_API_KEY=replace_with_local_development_key
+GEMINI_GUEST_MODEL=replace_with_supported_guest_model
+TURNSTILE_SECRET_KEY=replace_with_turnstile_secret
+TURNSTILE_SITE_KEY=replace_with_turnstile_site_key
+RATE_LIMIT_SALT=replace_with_long_random_secret
+GUEST_MODE_ENABLED=true
+GUEST_DAILY_LIMIT=5
+ALLOWED_ORIGINS=http://localhost:5173,https://openstudydeck.com,https://www.openstudydeck.com

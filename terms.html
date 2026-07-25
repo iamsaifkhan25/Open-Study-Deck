@@ -1,16 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-LTBKKM734X"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-
-    gtag('config', 'G-LTBKKM734X');
-  </script>
-
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Terms & Conditions | Open Study Deck</title>
@@ -37,6 +27,7 @@
   
   <!-- Back to Top Button Component -->
   <script type="module" src="back-to-top.js"></script>
+  <script type="module" src="analytics-consent.js"></script>
 </head>
 <body>
   <script>
@@ -99,12 +90,12 @@
           <hr class="card-divider">
 
           <h3 class="settings-card-title">2. Description of Service</h3>
-          <p class="settings-card-text">Open Study Deck is a multi-page, client-side, open-source educational study studio. It provides tools for students to summarize notes, generate detailed study outlines, convert screenshots into flashcards, and export formatted revision grids using Google Gemini models. The tool functions completely client-side in the browser.</p>
+          <p class="settings-card-text">Open Study Deck is a multi-page, browser-first, open-source educational study studio. It provides tools for students to summarize notes, generate detailed study outlines, convert screenshots into flashcards, and export formatted revision grids using Google Gemini models. The interface, your library, and your preferences run and stay in your browser; AI generation requests are sent either directly to Google Gemini using your own key (BYOK) or through Open Study Deck's own Cloudflare Function using a shared, rate-limited credential (Guest Access).</p>
 
           <hr class="card-divider">
 
           <h3 class="settings-card-title">3. Bring Your Own Key (BYOK) Responsibility</h3>
-          <p class="settings-card-text">Open Study Deck does not charge users or sell subscriptions. Accessing AI functionality requires you to input your own personal API Key. By inputting your key, you agree that:</p>
+          <p class="settings-card-text">Open Study Deck does not charge users or sell subscriptions. BYOK mode requires you to input your own personal Gemini API Key. By inputting your key, you agree that:</p>
           <ul class="settings-card-text" style="list-style-type: disc; margin-left: var(--space-lg); space-y: var(--space-xs);">
             <li>You are responsible for obtaining your key legitimately from Google AI Studio.</li>
             <li>You agree to abide by Google AI Studio's Terms of Service and usage policies.</li>
@@ -113,22 +104,38 @@
 
           <hr class="card-divider">
 
-          <h3 class="settings-card-title">4. User Conduct and File Uploads</h3>
+          <h3 class="settings-card-title">4. Guest Access &amp; Fair Use</h3>
+          <p class="settings-card-text">Guest Access lets you generate study decks without providing an API key, using a shared Open Study Deck-managed Gemini credential. By using Guest Access, you agree that:</p>
+          <ul class="settings-card-text" style="list-style-type: disc; margin-left: var(--space-lg); space-y: var(--space-xs);">
+            <li>Guest Access is rate-limited to a modest number of generations per day per visitor, enforced using a hashed, non-identifying usage record, and is provided to keep the free shared service usable for everyone.</li>
+            <li>Guest requests are protected by Cloudflare Turnstile, and you agree not to attempt to automate, script, or otherwise circumvent this verification or the daily quota.</li>
+            <li>Guest Access is offered on a best-effort basis and may be limited, throttled, or disabled at any time, including without notice, to protect the service or comply with Google's usage policies.</li>
+            <li>If Guest Access is unavailable or your daily allowance is reached, you may continue using the service via BYOK.</li>
+          </ul>
+
+          <hr class="card-divider">
+
+          <h3 class="settings-card-title">5. User Conduct and File Uploads</h3>
           <p class="settings-card-text">You retain full ownership of all text notes, textbook pages, images, and lecture documents processed through the interface. You agree not to upload any material that is illegal, offensive, infringes on third-party intellectual property rights, or contains malicious computer code.</p>
 
           <hr class="card-divider">
 
-          <h3 class="settings-card-title">5. Disclaimer of Warranties</h3>
+          <h3 class="settings-card-title">6. Disclaimer of Warranties</h3>
           <p class="settings-card-text">Open Study Deck is provided "as is" and "as available" without warranties of any kind, either express or implied. We do not warrant that the website will be uninterrupted, error-free, or that the AI results generated will be completely accurate or correct. Always cross-verify academic information before exams.</p>
 
           <hr class="card-divider">
 
-          <h3 class="settings-card-title">6. Limitation of Liability</h3>
-          <p class="settings-card-text">In no event shall the developer of Open Study Deck be liable for any direct, indirect, incidental, special, or consequential damages resulting from the use or inability to use the site, including but not limited to loss of academic progress, API key suspension by Google, or loss of study data stored in your local browser storage.</p>
+          <h3 class="settings-card-title">7. Limitation of Liability</h3>
+          <p class="settings-card-text">In no event shall the developer of Open Study Deck be liable for any direct, indirect, incidental, special, or consequential damages resulting from the use or inability to use the site, including but not limited to loss of academic progress, API key suspension by Google, guest quota exhaustion, or loss of study data stored in your local browser storage.</p>
 
           <hr class="card-divider">
 
-          <h3 class="settings-card-title">7. Changes to Terms</h3>
+          <h3 class="settings-card-title">8. Analytics</h3>
+          <p class="settings-card-text">Open Study Deck uses consent-based Google Analytics for aggregate product analytics. It is not loaded unless you grant permission via the consent banner, and can be turned off at any time via the "Analytics Preferences" link in the footer. See the <a href="privacy">Privacy Policy</a> for full details on what is and is not collected.</p>
+
+          <hr class="card-divider">
+
+          <h3 class="settings-card-title">9. Changes to Terms</h3>
           <p class="settings-card-text">We reserve the right to modify these terms at any time. Any changes will be posted on this page with an updated modification timestamp. Your continued use of the website following such changes constitutes your acceptance of the revised Terms.</p>
         </div>
 
@@ -146,6 +153,7 @@
           <a href="terms" class="scroll-top-link">Terms & Conditions</a>
           <a href="contact" class="scroll-top-link">Contact Us</a>
           <a href="/#faq-section" class="scroll-top-link">FAQ</a>
+          <a href="#" class="scroll-top-link" data-analytics-preferences-trigger>Analytics Preferences</a>
           <a href="/" class="scroll-top-link">Home</a>
         </div>
       </div>

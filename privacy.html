@@ -1,21 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-LTBKKM734X"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-
-    gtag('config', 'G-LTBKKM734X');
-  </script>
-
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Privacy Policy | Open Study Deck</title>
   
-  <meta name="description" content="Read our privacy policy. Open Study Deck is a privacy-first, serverless AI study studio. Your files and API keys stay local.">
+  <meta name="description" content="Read our privacy policy. Open Study Deck stores your decks and preferences in your browser with no account database. AI generation is sent to Google Gemini directly (BYOK) or via our protected guest gateway. Analytics is consent-based.">
+
   <link rel="canonical" href="https://openstudydeck.com/privacy">
   <meta name="robots" content="index, follow">
   
@@ -37,6 +28,7 @@
   
   <!-- Back to Top Button Component -->
   <script type="module" src="back-to-top.js"></script>
+  <script type="module" src="analytics-consent.js"></script>
 </head>
 <body>
   <script>
@@ -94,51 +86,92 @@
 
         <div class="workspace-card flex-col" style="gap: var(--space-md); padding: var(--space-xl); margin-bottom: var(--space-xl);">
           <h3 class="settings-card-title">1. Introduction</h3>
-          <p class="settings-card-text">Welcome to Open Study Deck ("we", "our", "us"). We are committed to protecting your privacy. This Privacy Policy details how we handle information in our multi-page study studio. Unlike traditional software-as-a-service platforms, Open Study Deck is a serverless application built with a privacy-first, zero-database architecture.</p>
+          <p class="settings-card-text">Welcome to Open Study Deck ("we", "our", "us"). This Privacy Policy explains what happens to your information when you use our study studio. Open Study Deck uses a browser-first architecture: we do not operate an account database or a cloud database for your decks. That said, the app does rely on a handful of third-party services (Google Gemini, FormSubmit, Razorpay, and a few CDN-hosted libraries) to function, and this page explains exactly what each of them sees.</p>
 
           <hr class="card-divider">
 
-          <h3 class="settings-card-title">2. No Personal Data Collection</h3>
-          <p class="settings-card-text">We do not operate backend databases, nor do we run user signups or tracking accounts. We collect exactly <strong>zero</strong> personal identifiable information (PII). You do not need to register, log in, or input your email to access any of our study tools.</p>
+          <h3 class="settings-card-title">2. No Account Database</h3>
+          <p class="settings-card-text">Open Study Deck has no user-account system and no cloud database of your decks. There is no signup, login, or profile. We do not collect an email address, name, or other identifying information just to let you use the study tools.</p>
 
           <hr class="card-divider">
 
-          <h3 class="settings-card-title">3. API Key & Local Storage Security</h3>
-          <p class="settings-card-text">Open Study Deck operates fully under the <strong>Bring Your Own Key (BYOK)</strong> model. When you configure your Google Gemini API Key:</p>
+          <h3 class="settings-card-title">3. Two Ways to Generate a Deck</h3>
+          <p class="settings-card-text">Open Study Deck offers two access modes, and they handle your content differently. Your library and interface state remain browser-first either way &mdash; AI generation itself always requires sending content to Google Gemini, either directly in BYOK mode or through the protected Open Study Deck guest gateway. Neither mode should be described as fully local.</p>
+
+          <hr class="card-divider">
+
+          <h3 class="settings-card-title">4. Guest Access (no API key)</h3>
           <ul class="settings-card-text" style="list-style-type: disc; margin-left: var(--space-lg); space-y: var(--space-xs);">
-            <li>The key is saved locally inside your browser's client-side storage (<code>localStorage</code>).</li>
-            <li>The key is never transmitted to our servers or stored in any cloud database.</li>
-            <li>Your key is used exclusively to sign and authorize requests directly from your browser to the official Google Gemini API endpoints.</li>
+            <li>The text or image you submit is sent from your browser to an Open Study Deck Cloudflare Function.</li>
+            <li>That Function forwards your content to Google Gemini using a shared, server-side credential and returns the generated deck to your browser.</li>
+            <li>Open Study Deck does not intentionally retain your submitted content or the generated response &mdash; there is no database storing guest generations.</li>
+            <li>Cloudflare and Google process the request as infrastructure/service providers under their own applicable terms.</li>
+            <li>Guest Access is protected by Cloudflare Turnstile, a bot-verification challenge. Turnstile runs in your browser and is verified server-side before any request is processed.</li>
+            <li>To enforce a daily generation limit, Open Study Deck temporarily stores a salted, one-way hash of your IP address plus the current date in Cloudflare KV, along with a generation count. Your raw IP address is never stored. This record automatically expires and is used only for quota enforcement, not identification.</li>
+            <li>Ordinary server metadata (such as request logs) may exist transiently at the Cloudflare/Google infrastructure level, outside of any Open Study Deck-controlled database.</li>
           </ul>
 
           <hr class="card-divider">
 
-          <h3 class="settings-card-title">4. Local Files and Image Processing</h3>
-          <p class="settings-card-text">When you drag and drop notes, textbook screenshots, or photo documents to generate study guides:</p>
+          <h3 class="settings-card-title">5. Bring Your Own Key (BYOK)</h3>
           <ul class="settings-card-text" style="list-style-type: disc; margin-left: var(--space-lg); space-y: var(--space-xs);">
-            <li>Your source images and documents are processed locally inside your browser's viewport.</li>
-            <li>The files are sent over secure encrypted HTTPS connections directly to the Google Gemini API to run text extraction and analysis.</li>
-            <li>No files are uploaded or stored on our servers. Your study files never leave your client environment except to travel directly to Google.</li>
+            <li>By default, your Gemini API key is kept in your browser's <code>sessionStorage</code> for the current tab, and clears when that tab or browser session ends.</li>
+            <li>If you check "Remember this key on this device," the key is instead saved in your browser's <code>localStorage</code> so it persists across visits on that browser. Only enable this on a device you trust.</li>
+            <li>Your key and your submitted text/image are sent directly from your browser to the Google Gemini API over HTTPS. Open Study Deck does not proxy, intercept, or receive the BYOK request &mdash; it never touches an Open Study Deck server.</li>
+            <li>Google processes that content and key according to its own applicable terms and privacy policies, which we do not control. Review Google's terms if you have concerns about sensitive material.</li>
+            <li>Open Study Deck does not retain a copy of what you submit or what Gemini returns. The generated result is rendered and stored only in your browser.</li>
           </ul>
 
           <hr class="card-divider">
 
-          <h3 class="settings-card-title">5. Data Retention & Cleardown</h3>
-          <p class="settings-card-text">Your study decks and history are stored locally in your browser cache. You have absolute sovereignty over this data. You can completely erase your local decks, generated card summaries, and your saved API key at any time by clicking "Clear Key" or "Clear All Decks" in the Settings area of the landing dashboard.</p>
+          <h3 class="settings-card-title">6. Local Browser Storage &amp; Data Retention</h3>
+          <p class="settings-card-text">Your generated study decks, theme/model/access-mode preferences, and (in BYOK mode, depending on your "Remember this key" choice) your API key are stored locally in your browser using <code>localStorage</code> and/or <code>sessionStorage</code>. This data can be erased by you at any time &mdash; via the "Clear Key" or "Clear All Decks" buttons in Settings &mdash; and can also be erased by ordinary browser behavior you don't control from our side: clearing site data, browser cleanup tools, private/incognito sessions ending, or switching to a different device or browser.</p>
 
           <hr class="card-divider">
 
-          <h3 class="settings-card-title">6. Third-Party Services</h3>
-          <p class="settings-card-text">Our application interfaces with the following third parties:</p>
+          <h3 class="settings-card-title">7. Cookies &amp; Analytics</h3>
+          <p class="settings-card-text">Open Study Deck uses consent-based Google Analytics (measurement ID G-LTBKKM734X) to understand aggregate product usage, such as which study modes are used and whether generation succeeds. It is implemented with a Basic Consent Mode approach:</p>
           <ul class="settings-card-text" style="list-style-type: disc; margin-left: var(--space-lg); space-y: var(--space-xs);">
-            <li><strong>Google Gemini API:</strong> Processes your uploaded content and keys to generate study decks. Their usage is governed by Google AI Studio Terms of Service.</li>
-            <li><strong>FormSubmit:</strong> Used on our Contact page to forward feedback emails to the developer.</li>
+            <li>Analytics is not loaded and no request is sent to Google until you click "Allow Analytics" on the consent banner shown on your first visit.</li>
+            <li>If you decline (or take no action), Analytics stays unloaded and no Analytics cookies or requests occur.</li>
+            <li>When enabled, Analytics is limited to ordinary page-view and product-event measurement. We do not enable advertising features, Google Signals, or personalized-advertising signals, and we do not create a user ID.</li>
+            <li>Study content, generated answers, API keys, filenames, deck titles, subject context, pasted text, image data, email addresses, donation messages, and raw error messages are never intentionally sent as analytics data. Custom events use only controlled values like a study mode name or a generic failure category.</li>
+            <li>You can change your decision at any time via the "Analytics Preferences" link in the site footer. Declining after previously allowing Analytics stops future events and attempts to remove first-party Google Analytics cookies from your browser.</li>
           </ul>
 
           <hr class="card-divider">
 
-          <h3 class="settings-card-title">7. Contact Us</h3>
-          <p class="settings-card-text">If you have any questions regarding this Privacy Policy or your data sovereignty, you can reach out via our contact portal or by emailing the developer directly at <strong>harukiwaves@zohomail.in</strong>.</p>
+          <h3 class="settings-card-title">8. Information You Voluntarily Provide</h3>
+          <p class="settings-card-text">Some parts of the site collect information only because you choose to submit it:</p>
+          <ul class="settings-card-text" style="list-style-type: disc; margin-left: var(--space-lg); space-y: var(--space-xs);">
+            <li><strong>Contact form:</strong> the name, email address, and message you enter are sent via FormSubmit to the developer's inbox.</li>
+            <li><strong>Donations:</strong> if you choose to support the project financially, payment details are handled by Razorpay's checkout flow. Open Study Deck does not directly collect or store your card or payment information.</li>
+          </ul>
+
+          <hr class="card-divider">
+
+          <h3 class="settings-card-title">9. Third-Party Services</h3>
+          <p class="settings-card-text">The application currently relies on the following third-party services. Each can receive ordinary technical request information (such as your IP address, browser/user-agent string, and the resource requested) as a normal part of serving their content, in addition to anything described above:</p>
+          <ul class="settings-card-text" style="list-style-type: disc; margin-left: var(--space-lg); space-y: var(--space-xs);">
+            <li><strong>Google Gemini API:</strong> processes the text/images and, in BYOK mode, your API key, to generate study decks. Governed by Google's terms and privacy policy.</li>
+            <li><strong>Cloudflare (Pages Functions, KV, Turnstile):</strong> hosts the Guest Access gateway, temporarily stores hashed guest-quota records, and verifies the Turnstile bot-protection challenge.</li>
+            <li><strong>Google Analytics:</strong> aggregate product analytics, loaded only after you grant consent. See Section 7.</li>
+            <li><strong>FormSubmit:</strong> forwards Contact page submissions (name, email, message) to the developer's inbox.</li>
+            <li><strong>Razorpay:</strong> processes payment information for voluntary donations.</li>
+            <li><strong>Google Fonts:</strong> serves the Inter and JetBrains Mono webfonts used across the site.</li>
+            <li><strong>jsDelivr:</strong> a CDN used to load the html2canvas library and the Google GenAI SDK used to call Gemini in BYOK mode.</li>
+            <li><strong>Tailwind CDN:</strong> loads Tailwind's utility CSS engine used for portions of the layout.</li>
+          </ul>
+
+          <hr class="card-divider">
+
+          <h3 class="settings-card-title">10. AI-Generated Content</h3>
+          <p class="settings-card-text">Study decks are generated by an AI model and can be inaccurate, incomplete, or outdated. Always verify important facts before relying on generated content for exams or academic submissions.</p>
+
+          <hr class="card-divider">
+
+          <h3 class="settings-card-title">11. Contact Us</h3>
+          <p class="settings-card-text">If you have any questions regarding this Privacy Policy, you can reach out via our contact portal or by emailing the developer directly at <strong>harukiwaves@zohomail.in</strong>.</p>
         </div>
 
       </div>
@@ -155,6 +188,7 @@
           <a href="terms" class="scroll-top-link">Terms & Conditions</a>
           <a href="contact" class="scroll-top-link">Contact Us</a>
           <a href="/#faq-section" class="scroll-top-link">FAQ</a>
+          <a href="#" class="scroll-top-link" data-analytics-preferences-trigger>Analytics Preferences</a>
           <a href="/" class="scroll-top-link">Home</a>
         </div>
       </div>

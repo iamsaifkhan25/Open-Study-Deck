@@ -1,16 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-LTBKKM734X"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-
-    gtag('config', 'G-LTBKKM734X');
-  </script>
-
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>About Us | Open Study Deck</title>
@@ -37,6 +27,7 @@
   
   <!-- Back to Top Button Component -->
   <script type="module" src="back-to-top.js"></script>
+  <script type="module" src="analytics-consent.js"></script>
 </head>
 <body>
   <script>
@@ -97,33 +88,33 @@
             Open Study Deck was born out of frustration. As students and self-learners, we were exhausted by seeing basic, helpful educational tools locked behind monthly SaaS subscriptions and restrictive analytical paywalls. We believed that study tools shouldn&apos;t carry a price tag that gates your grades. Too often, students are forced to choose between paying for premium subscriptions or manually writing out definitions, notes, and outlines. This economic barrier makes learning harder for those who need it most.
           </p>
           <p class="settings-card-text">
-            Our mission is to democratize digital learning. By creating a serverless, multi-page web application, we put you in charge of your own data and model allocations. Using the Google Gemini API directly from your browser means you get high-fidelity visual cards and textbook summarizations completely client-side. There are no registration forms, no usage ceilings, and no subscription popups interrupting your study flow.
+            Our mission is to democratize digital learning. By building a browser-first, multi-page web application with no account database, we put you in charge of your own data and model access. Using the Google Gemini API with your own key means you get high-fidelity visual cards and textbook summarizations without Open Study Deck standing between you and the model. There are no registration forms and no Open Study Deck subscription popups interrupting your study flow.
           </p>
           <p class="settings-card-text">
-            By offering a completely <strong>free alternative to AI study apps</strong>, we hope to build a workspace where any student can study effectively. Whether you are analyzing organic chemistry diagrams, medical charts, or legal briefs, Open Study Deck provides an unthrottled environment that works at your pace, completely free of charge.
+            By offering a completely <strong>free alternative to AI study apps</strong>, we hope to build a workspace where any student can study effectively. Whether you are analyzing organic chemistry diagrams, medical charts, or legal briefs, Open Study Deck stays free of charge &mdash; your pace is limited only by the quota on your own Google AI project, not by an Open Study Deck paywall.
           </p>
 
           <hr class="card-divider">
 
-          <h3 class="settings-card-title">The BYOK (Bring Your Own Key) Philosophy &amp; Absolute Privacy</h3>
+          <h3 class="settings-card-title">The BYOK (Bring Your Own Key) Philosophy &amp; Privacy-Conscious Design</h3>
           <p class="settings-card-text">
             &quot;Bring Your Own Key&quot; (BYOK) is a developer-centric architectural approach that we brought to the student community. When standard applications host API keys, they have to pay for server hosting, database maintenance, and cloud bandwidth. To cover these costs and make a profit, they charge users a monthly markup. BYOK eliminates the middleman. You grab a free API key from Google AI Studio, save it in your browser settings, and make queries directly to Google. This keeps our platform free to use, passing all savings directly to you.
           </p>
           <p class="settings-card-text">
-            This model also makes Open Study Deck a <strong>privacy first ai flashcard generator</strong>. Other platforms require you to upload your lecture files and screenshots to their external servers, where they analyze and store your data. Open Study Deck doesn&apos;t have login databases, analytics trackers, or sync servers. Everything happens inside your browser. Your notes, images, and API key stay on your local disk.
+            This model also makes Open Study Deck a <strong>privacy-conscious ai flashcard generator</strong>. Other platforms require you to upload your lecture files and screenshots to their own servers, where they store and sometimes analyze your data for their own purposes. Open Study Deck doesn&apos;t have a login database or a sync server, and it only runs Google Analytics if you explicitly allow it &mdash; see the consent banner and Privacy Policy for details. The interface runs in your browser, and your notes, images, and generated decks stay in your browser&apos;s local storage. To generate a card, the content you submit is sent either directly from your browser to Google Gemini (BYOK) or through Open Study Deck&apos;s protected guest gateway to Gemini (Guest Access) &mdash; that request is how the AI analysis happens, and Open Study Deck does not retain your study content or generated decks on its own servers in either case.
           </p>
           <p class="settings-card-text">
-            Your key is cached securely in your browser&apos;s persistent LocalStorage, allowing you to use the tool without re-entering credentials on every visit. Queries are sent via encrypted HTTPS connections directly to Google&apos;s models. We cannot see, access, or record your key or study documents. This design keeps your coursework completely secure and private.
+            By default, your key is kept in your browser&apos;s session storage for the current tab. If you check &quot;Remember this key on this device,&quot; it&apos;s saved in local storage instead so you don&apos;t need to re-enter it on your next visit &mdash; only enable that on a device you trust. Either way, queries are sent via encrypted HTTPS connections directly to Google&apos;s models, and Open Study Deck has no backend that receives or records your key or study documents.
           </p>
 
           <hr class="card-divider">
 
-          <h3 class="settings-card-title">Visual Conversion, Multimodal Processing &amp; OCR Engine</h3>
+          <h3 class="settings-card-title">Visual Conversion &amp; Multimodal Processing</h3>
           <p class="settings-card-text">
             Our studio workspace includes a powerful <strong>AI Flashcard Generator from Image</strong>. Students no longer need to spend hours manually typing terms and definitions into card templates. Drag and drop your textbook photos, slides, or handwritten notes into our workspace drop zone.
           </p>
           <p class="settings-card-text">
-            The app utilizes Gemini&apos;s multimodal processing to scan images natively inside the browser viewport. The system reads hand-written characters, maps layouts, and identifies key definitions. It lets you <strong>convert picture to flashcards online</strong> in seconds, converting slides to study guides.
+            The app sends your image to Gemini&apos;s multimodal model for analysis. The model reads hand-written characters, maps layouts, and identifies key definitions, then returns structured results that render as a study card in your browser. It lets you <strong>convert picture to flashcards online</strong> in seconds, converting slides to study guides.
           </p>
           <p class="settings-card-text">
             If you are working with long chapters, our textbook screenshot summarizer AI is an excellent tool. It functions as a photo to study notes converter, allowing you to convert screenshots to comprehensive detailed outlines or summaries. You can also toggle the &quot;Explain Like I&apos;m 5&quot; (ELI5) mode to break down complex topics into simple analogies. This is ideal for medical and legal students working with heavy reading volumes.
@@ -169,6 +160,7 @@
           <a href="terms" class="scroll-top-link">Terms & Conditions</a>
           <a href="contact" class="scroll-top-link">Contact Us</a>
           <a href="/#faq-section" class="scroll-top-link">FAQ</a>
+          <a href="#" class="scroll-top-link" data-analytics-preferences-trigger>Analytics Preferences</a>
           <a href="/" class="scroll-top-link">Home</a>
         </div>
       </div>

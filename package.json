@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:cf": "npx wrangler pages dev -- npm run dev",
     "build": "vite build",
     "preview": "vite preview",
     "deploy": "npx wrangler pages deploy ./dist --project-name openstudydeck --branch main"
