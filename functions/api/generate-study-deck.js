@@ -244,7 +244,11 @@ async function callGemini({ apiKey, model, contentPart, modeConfig }) {
     // Safe to log: HTTP status and Google's short reason code. Never the
     // full message (could echo request specifics) or the API key.
     const googleStatus = (errBody && errBody.error && errBody.error.status) || 'unknown';
-    console.error(`generate-study-deck: Gemini call failed — http=${response.status} googleStatus=${googleStatus}`);
+    // Google's 4xx validation messages describe OUR request's structure
+    // (e.g. "Unknown name X at 'generationConfig'") — they do not echo
+    // guest-submitted content, so this is safe to log. Capped defensively.
+    const rawMessage = ((errBody && errBody.error && errBody.error.message) || '').slice(0, 300);
+    console.error(`generate-study-deck: Gemini call failed — http=${response.status} googleStatus=${googleStatus} message=${rawMessage}`);
 
     let code = 'UNKNOWN_ERROR';
     if (response.status === 429) {
