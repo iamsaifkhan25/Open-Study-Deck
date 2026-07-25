@@ -60,6 +60,7 @@ export async function onRequestPost(context) {
 
     if (!env.GEMINI_API_KEY || !env.GEMINI_GUEST_MODEL) {
       // Fail clearly rather than silently choosing a fallback model.
+      console.error('generate-study-deck: SERVER_CONFIGURATION_ERROR — missing GEMINI_API_KEY or GEMINI_GUEST_MODEL');
       return guestErrorResponse('SERVER_CONFIGURATION_ERROR');
     }
 
@@ -131,6 +132,7 @@ export async function onRequestPost(context) {
       return guestErrorResponse('TURNSTILE_REQUIRED');
     }
     if (!env.TURNSTILE_SECRET_KEY) {
+      console.error('generate-study-deck: SERVER_CONFIGURATION_ERROR — missing TURNSTILE_SECRET_KEY');
       return guestErrorResponse('SERVER_CONFIGURATION_ERROR');
     }
     const remoteIp = request.headers.get('CF-Connecting-IP') || undefined;
@@ -141,6 +143,7 @@ export async function onRequestPost(context) {
 
     // --- Daily quota (checked before spending a Gemini call) ---
     if (!env.GUEST_USAGE) {
+      console.error('generate-study-deck: SERVER_CONFIGURATION_ERROR — missing GUEST_USAGE KV binding');
       return guestErrorResponse('SERVER_CONFIGURATION_ERROR');
     }
     const dailyLimit = Number(env.GUEST_DAILY_LIMIT) > 0 ? Number(env.GUEST_DAILY_LIMIT) : 5;
@@ -225,6 +228,7 @@ async function callGemini({ apiKey, model, contentPart, modeConfig }) {
       }
     );
   } catch (err) {
+    console.error('generate-study-deck: network error calling Gemini');
     return { ok: false, code: 'GEMINI_SERVICE_UNAVAILABLE' };
   }
 
@@ -232,6 +236,10 @@ async function callGemini({ apiKey, model, contentPart, modeConfig }) {
     let errBody = null;
     try { errBody = await response.json(); } catch (err) { /* non-JSON error body */ }
     const message = ((errBody && errBody.error && errBody.error.message) || '').toLowerCase();
+    // Safe to log: HTTP status and Google's short reason code. Never the
+    // full message (could echo request specifics) or the API key.
+    const googleStatus = (errBody && errBody.error && errBody.error.status) || 'unknown';
+    console.error(`generate-study-deck: Gemini call failed — http=${response.status} googleStatus=${googleStatus}`);
 
     let code = 'UNKNOWN_ERROR';
     if (response.status === 429) {
