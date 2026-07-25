@@ -26,6 +26,10 @@ const GUEST_ERROR_DEFS = {
   GEMINI_SAFETY_BLOCK: { status: 422, message: 'The AI declined to process this content.' },
   GEMINI_SERVICE_UNAVAILABLE: { status: 502, message: "Google's AI service is temporarily unavailable." },
   SERVER_CONFIGURATION_ERROR: { status: 500, message: 'Guest access is temporarily misconfigured. Please use your own Gemini API key.' },
+  RESPONSE_TOO_LONG: { status: 422, message: 'The generated study deck was too large to complete reliably. Try a shorter source, choose Summary mode, or split the material into smaller sections.' },
+  RESPONSE_INCOMPLETE: { status: 422, message: 'The AI returned an incomplete study deck. Please try again. If the source is very long, use a shorter section.' },
+  RESPONSE_INVALID_FORMAT: { status: 502, message: 'The AI returned an incomplete study deck. Please try again. If the source is very long, use a shorter section.' },
+  RESPONSE_EMPTY: { status: 502, message: "Google's AI service did not return usable study content. Please retry with clearer source material." },
   UNKNOWN_ERROR: { status: 500, message: 'Something went wrong. Please try again.' }
 };
 

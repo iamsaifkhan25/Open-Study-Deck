@@ -1083,29 +1083,71 @@ body.dark-mode .fixed-header-logo.initial-large.scrolled {
   box-shadow: var(--shadow-l2);
 }
 
-/* Access Mode Selector (Guest vs BYOK) */
-.access-mode-container {
+/* Access Mode Selector (Guest vs BYOK) — standalone bar above the studio grid,
+   kept separate from the input/output cards so neither is inflated by it. */
+.access-mode-bar {
   display: flex;
   flex-direction: column;
-  gap: var(--space-xs);
-  margin-bottom: var(--space-md);
+  gap: var(--space-sm);
+  background-color: var(--bg-canvas);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-l1);
+  padding: var(--space-md) var(--space-lg);
+  margin-bottom: var(--space-lg);
 }
 
-.access-mode-grid {
+.access-mode-bar-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+@media (min-width: 640px) {
+  .access-mode-bar-row {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-lg);
+  }
+}
+
+.access-mode-bar-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.access-mode-bar-desc {
+  font-size: 12.5px;
+  line-height: 1.4;
+  color: var(--text-mute);
+  margin: 0;
+}
+
+.access-mode-pill-group {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: var(--space-xs);
+  background-color: rgba(0, 0, 0, 0.03);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius-pill);
+  padding: var(--space-xxs);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  width: 100%;
 }
 
-@media (max-width: 480px) {
-  .access-mode-grid {
-    grid-template-columns: 1fr;
+@media (min-width: 640px) {
+  .access-mode-pill-group {
+    width: auto;
+    min-width: 320px;
+    flex-shrink: 0;
   }
 }
 
 /* Radio input stays in the accessibility tree and keyboard tab order —
    visually hidden, not display:none, so it remains focusable. */
-.access-mode-card input {
+.access-mode-pill input {
   position: absolute;
   width: 1px;
   height: 1px;
@@ -1117,51 +1159,51 @@ body.dark-mode .fixed-header-logo.initial-large.scrolled {
   border: 0;
 }
 
-.access-mode-card-content {
+.access-mode-pill-content {
   display: flex;
-  flex-direction: column;
-  gap: 4px;
-  border: 1.5px solid var(--border-hairline);
-  border-radius: var(--radius-md);
-  padding: var(--space-sm);
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-pill);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-body);
   cursor: pointer;
-  background-color: rgba(255, 255, 255, 0.45);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  text-align: center;
   transition: all var(--transition-fast);
 }
 
-.access-mode-title {
-  font-size: 13px;
-  font-weight: 600;
+.access-mode-pill-content:hover {
   color: var(--text-ink);
 }
 
-.access-mode-desc {
-  font-size: 11.5px;
-  line-height: 1.4;
-  color: var(--text-mute);
+.access-mode-pill input:checked + .access-mode-pill-content {
+  background-color: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  color: var(--text-ink);
+  font-weight: 600;
+  box-shadow: var(--shadow-l1);
 }
 
-.access-mode-card-content:hover {
-  background-color: rgba(0, 0, 0, 0.02);
-  border-color: var(--ds-gray-400);
-}
-
-.access-mode-card input:checked + .access-mode-card-content {
-  background-color: rgba(23, 23, 23, 0.85);
-  border-color: rgba(23, 23, 23, 0.85);
-  box-shadow: var(--shadow-l2);
-}
-
-.access-mode-card input:checked + .access-mode-card-content .access-mode-title,
-.access-mode-card input:checked + .access-mode-card-content .access-mode-desc {
-  color: #ffffff;
-}
-
-.access-mode-card input:focus-visible + .access-mode-card-content {
+.access-mode-pill input:focus-visible + .access-mode-pill-content {
   outline: 2px solid var(--primary-cta, #0070f3);
   outline-offset: 2px;
+}
+
+/* Guest option is disabled once the deployment reports guest mode as
+   unavailable — reduced opacity + not-allowed cursor per disabled-state
+   convention, so the user isn't led into a selection that always fails. */
+.access-mode-pill.is-disabled {
+  opacity: 0.45;
+}
+
+.access-mode-pill.is-disabled .access-mode-pill-content {
+  cursor: not-allowed;
+}
+
+.access-mode-pill.is-disabled .access-mode-pill-content:hover {
+  color: var(--text-body);
 }
 
 .guest-panel {
@@ -1173,6 +1215,14 @@ body.dark-mode .fixed-header-logo.initial-large.scrolled {
 .guest-quota-row {
   font-size: 12px;
   color: var(--text-mute);
+}
+
+.guest-config-retry-btn {
+  font-size: 11px;
+  padding: 4px 10px;
+  height: auto;
+  line-height: 1.4;
+  margin-top: var(--space-xs);
 }
 
 .turnstile-container {
@@ -1189,31 +1239,26 @@ body.dark-mode .fixed-header-logo.initial-large.scrolled {
   color: var(--ds-red, #ee0000);
 }
 
-body.dark-mode .access-mode-card-content {
-  background-color: rgba(30, 41, 59, 0.45);
+body.dark-mode .access-mode-pill-group {
+  background-color: rgba(255, 255, 255, 0.02);
+  border-color: rgba(56, 189, 248, 0.15);
+}
+
+body.dark-mode .access-mode-pill input:checked + .access-mode-pill-content {
+  background-color: rgba(30, 41, 59, 0.75);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  border-color: rgba(255, 255, 255, 0.08);
+  color: #38bdf8;
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-body.dark-mode .access-mode-title {
-  color: var(--text-ink);
-}
-
-body.dark-mode .access-mode-card input:checked + .access-mode-card-content {
-  background-color: rgba(56, 189, 248, 0.12);
-  border-color: #38bdf8;
-  box-shadow: 0 0 12px rgba(56, 189, 248, 0.2);
-}
-
-body.dark-mode .access-mode-card input:checked + .access-mode-card-content .access-mode-title,
-body.dark-mode .access-mode-card input:checked + .access-mode-card-content .access-mode-desc {
+body.dark-mode .access-mode-pill-content:hover {
   color: #38bdf8;
 }
 
-body.dark-mode .access-mode-card-content:hover {
-  background-color: rgba(56, 189, 248, 0.05);
-  border-color: rgba(56, 189, 248, 0.3);
+body.dark-mode .access-mode-pill.is-disabled .access-mode-pill-content:hover {
+  color: var(--text-body);
 }
 
 /* Advanced details */
@@ -3066,7 +3111,9 @@ body.dark-mode .fullscreen-modal-body {
   left: var(--space-md);
   right: var(--space-md);
   bottom: var(--space-md);
-  z-index: 1000;
+  /* Below .modal-overlay / .fullscreen-modal-overlay (z-index: 1000) so an
+     open modal always sits above the banner instead of relying on DOM order. */
+  z-index: 900;
   margin: 0 auto;
   max-width: 640px;
   background: var(--bg-page, #ffffff);

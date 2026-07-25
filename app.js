@@ -10,7 +10,11 @@ import {
   ALLOWED_IMAGE_MIME_TYPES,
   MAX_GUEST_IMAGE_BYTES,
   buildModeConfig,
-  getModeLabel
+  getModeLabel,
+  getOutputTokenBudget,
+  classifyGeneratedResponse,
+  isRetryableForLength,
+  RESPONSE_ISSUE
 } from './shared/study-config.js';
 import {
   initializeAnalyticsConsent,
@@ -41,7 +45,11 @@ const State = {
   // Guest / BYOK access mode
   accessMode: 'guest', // 'guest' | 'byok'
   guestConfig: { guestModeEnabled: false, turnstileSiteKey: null, guestDailyLimit: 5 },
-  guestConfigLoaded: false,
+  guestConfigLoaded: false, // true once we have a definitive answer, either way
+  // true only when /api/public-config itself could not be reached/parsed
+  // (network error, 5xx, malformed body) — distinct from the owner
+  // explicitly setting guestModeEnabled:false in a successful response.
+  guestConfigUnavailable: false,
   guestUsageRemaining: null,
   turnstileWidgetId: null,
   turnstileToken: null
@@ -78,10 +86,12 @@ const DOM = {
   // Access Mode (Guest / BYOK)
   accessModeGuestRadio: document.getElementById('access-mode-guest'),
   accessModeByokRadio: document.getElementById('access-mode-byok'),
+  accessModeBarDesc: document.getElementById('access-mode-bar-desc'),
   guestPanel: document.getElementById('guest-panel'),
   guestQuotaText: document.getElementById('guest-quota-text'),
   turnstileContainer: document.getElementById('turnstile-container'),
   guestStatusMessage: document.getElementById('guest-status-message'),
+  guestConfigRetryBtn: document.getElementById('guest-config-retry-btn'),
 
   // Action triggers
   generateBtn: document.getElementById('generate-btn'),
@@ -681,32 +691,102 @@ function initAccessMode() {
     });
   });
 
+  if (DOM.guestConfigRetryBtn) {
+    DOM.guestConfigRetryBtn.addEventListener('click', () => {
+      fetchPublicConfig();
+    });
+  }
+
   syncAccessModeUI();
   fetchPublicConfig();
 }
 
 async function fetchPublicConfig() {
   if (DOM.guestQuotaText) DOM.guestQuotaText.textContent = 'Checking guest availability…';
+  if (DOM.guestConfigRetryBtn) DOM.guestConfigRetryBtn.style.display = 'none';
+  State.guestConfigUnavailable = false;
+
   try {
     const res = await fetch('/api/public-config');
     if (!res.ok) throw new Error('public-config request failed');
     const data = await res.json();
+    if (!data || typeof data !== 'object') throw new Error('malformed public-config response');
     State.guestConfig = {
       guestModeEnabled: !!data.guestModeEnabled,
       turnstileSiteKey: data.turnstileSiteKey || null,
       guestDailyLimit: Number(data.guestDailyLimit) > 0 ? Number(data.guestDailyLimit) : 5
     };
   } catch (err) {
-    // Network failure, blocked request, or misconfiguration — guest mode is
-    // simply unavailable; BYOK remains fully usable.
+    // The config endpoint itself could not be reached or parsed — this is
+    // NOT the same as the owner explicitly disabling guest access, so it
+    // must not be reported to the user as "Guest Access has been disabled".
     State.guestConfig = { guestModeEnabled: false, turnstileSiteKey: null, guestDailyLimit: 5 };
+    State.guestConfigUnavailable = true;
+    if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
+      console.info('[Open Study Deck] /api/public-config could not be reached. Plain `npm run dev` mocks this route already; for full Cloudflare Pages Functions parity (real KV bindings, etc.) use `npm run dev:cf` (wrangler pages dev). See docs/CLOUDFLARE_GUEST_AI_SETUP.md.');
+    }
   }
+
   State.guestConfigLoaded = true;
   syncAccessModeUI();
 }
 
 function syncAccessModeUI() {
   const isGuest = State.accessMode === 'guest';
+
+  // Explicitly disabled: the config endpoint responded successfully and the
+  // owner has guestModeEnabled:false (or omitted the Turnstile site key
+  // while still enabling guest mode, which is also an owner-side
+  // misconfiguration rather than a transient fetch failure).
+  const isExplicitlyDisabled = State.guestConfigLoaded && !State.guestConfigUnavailable &&
+    !State.guestConfig.guestModeEnabled;
+
+  // Temporarily unavailable: the config request itself failed (network,
+  // 5xx, malformed body), or it succeeded with guest mode "on" but missing
+  // the Turnstile site key it needs to actually run.
+  const isConfigUnavailable = State.guestConfigLoaded &&
+    (State.guestConfigUnavailable || (State.guestConfig.guestModeEnabled && !State.guestConfig.turnstileSiteKey));
+
+  const guestKnownUnavailable = isExplicitlyDisabled || isConfigUnavailable;
+
+  // Once we know guest access is unavailable, disable the option outright —
+  // otherwise a user could select it and only discover it's a dead end after
+  // hitting "Analyze & Generate".
+  if (DOM.accessModeGuestRadio) {
+    DOM.accessModeGuestRadio.disabled = guestKnownUnavailable;
+    DOM.accessModeGuestRadio.setAttribute('aria-disabled', String(guestKnownUnavailable));
+    const guestPill = DOM.accessModeGuestRadio.closest('.access-mode-pill');
+    if (guestPill) guestPill.classList.toggle('is-disabled', guestKnownUnavailable);
+  }
+
+  if (guestKnownUnavailable && isGuest) {
+    State.accessMode = 'byok';
+    localStorage.setItem(ACCESS_MODE_STORAGE_KEY, State.accessMode);
+    if (DOM.accessModeByokRadio) DOM.accessModeByokRadio.checked = true;
+    if (DOM.accessModeGuestRadio) DOM.accessModeGuestRadio.checked = false;
+    showToast(
+      isExplicitlyDisabled
+        ? 'Guest access is currently disabled on this deployment — switched to "Use My Own Key".'
+        : 'Guest access is temporarily unavailable — switched to "Use My Own Key".',
+      'info'
+    );
+    return syncAccessModeUI();
+  }
+
+  if (DOM.accessModeBarDesc) {
+    DOM.accessModeBarDesc.textContent = isGuest
+      ? 'Try Open Study Deck without configuring an API key. Guest generations are limited to protect the free service.'
+      : 'Use your personal Gemini API quota for additional generations and direct browser-to-Google requests.';
+  }
+
+  // Lives next to the description (not inside .guest-panel) so it stays
+  // reachable even after guestKnownUnavailable forces a switch to BYOK and
+  // hides the guest panel — otherwise a disabled Guest radio would leave the
+  // user with no way to retry short of a full page reload. Never shown for
+  // an explicit disable, since retrying can't fix an owner's deliberate choice.
+  if (DOM.guestConfigRetryBtn) {
+    DOM.guestConfigRetryBtn.style.display = isConfigUnavailable ? 'inline-block' : 'none';
+  }
 
   if (DOM.guestPanel) DOM.guestPanel.style.display = isGuest ? 'flex' : 'none';
 
@@ -727,9 +807,17 @@ function syncAccessModeUI() {
     return;
   }
 
-  if (!State.guestConfig.guestModeEnabled || !State.guestConfig.turnstileSiteKey) {
+  if (isExplicitlyDisabled) {
     if (DOM.guestQuotaText) {
-      DOM.guestQuotaText.textContent = 'Guest access is currently unavailable on this deployment. Please use "Use My Own Key" instead.';
+      DOM.guestQuotaText.textContent = 'Guest Access is currently disabled. You can continue using your own Gemini key.';
+    }
+    if (DOM.turnstileContainer) DOM.turnstileContainer.innerHTML = '';
+    return;
+  }
+
+  if (isConfigUnavailable) {
+    if (DOM.guestQuotaText) {
+      DOM.guestQuotaText.textContent = 'Guest Access is temporarily unavailable because its configuration could not be loaded. You can use BYOK or try again later.';
     }
     if (DOM.turnstileContainer) DOM.turnstileContainer.innerHTML = '';
     return;
@@ -827,7 +915,11 @@ function mapGuestErrorToFailureCategory(code) {
     GEMINI_SAFETY_BLOCK: 'safety_block',
     GEMINI_SERVICE_UNAVAILABLE: 'service_unavailable',
     SERVER_CONFIGURATION_ERROR: 'service_unavailable',
-    GUEST_MODE_DISABLED: 'service_unavailable'
+    GUEST_MODE_DISABLED: 'service_unavailable',
+    RESPONSE_TOO_LONG: 'response_too_long',
+    RESPONSE_INCOMPLETE: 'invalid_response',
+    RESPONSE_INVALID_FORMAT: 'invalid_response',
+    RESPONSE_EMPTY: 'invalid_response'
   };
   return map[code] || 'unknown';
 }
@@ -862,6 +954,13 @@ function guestErrorToUserMessage(code, extra = {}) {
       return "Google's AI service is temporarily unavailable. Your material was not saved by Open Study Deck.";
     case 'SERVER_CONFIGURATION_ERROR':
       return 'Guest access is temporarily misconfigured. Please use your own Gemini key.';
+    case 'RESPONSE_TOO_LONG':
+      return 'The generated study deck was too large to complete reliably. Try a shorter source, choose Summary mode, or split the material into smaller sections.';
+    case 'RESPONSE_INCOMPLETE':
+    case 'RESPONSE_INVALID_FORMAT':
+      return 'The AI returned an incomplete study deck. Please try again. If the source is very long, use a shorter section.';
+    case 'RESPONSE_EMPTY':
+      return "Google's AI service did not return usable study content. Please retry with clearer source material.";
     default:
       return 'Something went wrong. Please try again.';
   }
@@ -1032,16 +1131,22 @@ async function handleByokGeneration() {
     ? { inlineData: { data: input.imageBase64, mimeType: input.imageMimeType } }
     : input.text;
 
-  const { schema, systemInstruction, userPrompt } = buildModeConfig(State.selectedMode, State.focusSubjectContext);
+  const sourceLength = input.inputType === 'text' ? input.text.length : 0;
 
   trackAnalyticsEvent('generation_started', { access_mode: 'byok', study_mode: State.selectedMode, input_type: input.inputType });
   setGenerationLoadingState(true);
 
   try {
     const ai = new GoogleGenAI({ apiKey: State.apiKey });
-    const contents = [payloadObject, userPrompt];
-    const response = await executeWithFallback(ai, State.selectedModel, contents, schema, systemInstruction);
-    const parsedData = JSON.parse(response.text);
+    const result = await generateByokDeck({
+      ai,
+      model: State.selectedModel,
+      payloadObject,
+      mode: State.selectedMode,
+      subjectContext: State.focusSubjectContext,
+      sourceLength
+    });
+    const parsedData = result.data;
 
     const deckRecord = {
       id: 'deck_' + Date.now(),
@@ -1065,7 +1170,11 @@ async function handleByokGeneration() {
     let errorMsg = 'Failed to analyze contents. ';
     let failureCategory = 'unknown';
 
-    if (err.message) {
+    if (err.responseIssue) {
+      const mapped = mapResponseIssueToByokMessage(err.responseIssue, err.completion);
+      errorMsg = mapped.message;
+      failureCategory = mapped.failureCategory;
+    } else if (err.message) {
       if (err.message.includes('API key') || err.message.includes('400')) {
         errorMsg += 'Invalid API Key. Please verify settings.';
         failureCategory = 'invalid_key';
@@ -1093,6 +1202,39 @@ async function handleByokGeneration() {
   }
 }
 
+// Maps an internal response-classification issue to the same quality of
+// actionable message the guest endpoint returns, without routing the
+// personal BYOK key through the guest endpoint or its error-code system.
+function mapResponseIssueToByokMessage(issue, completion) {
+  const tooLong = {
+    message: 'The generated study deck was too large to complete reliably. Try a shorter source, choose Summary mode, or split the material into smaller sections.',
+    failureCategory: 'response_too_long'
+  };
+  const invalidResponse = {
+    message: 'The AI returned an incomplete study deck. Please try again. If the source is very long, use a shorter section.',
+    failureCategory: 'invalid_response'
+  };
+
+  switch (issue) {
+    case RESPONSE_ISSUE.SAFETY_BLOCK:
+      return { message: 'The AI declined to process this content.', failureCategory: 'safety_block' };
+    case RESPONSE_ISSUE.EMPTY:
+      return {
+        message: "Google's AI service did not return usable study content. Please retry with clearer source material.",
+        failureCategory: 'invalid_response'
+      };
+    case RESPONSE_ISSUE.MAX_TOKENS_NO_TEXT:
+      return tooLong;
+    case RESPONSE_ISSUE.TRUNCATED_JSON:
+      return completion === 'max_tokens' ? tooLong : invalidResponse;
+    case RESPONSE_ISSUE.INVALID_STRUCTURE:
+    case RESPONSE_ISSUE.MALFORMED_JSON:
+      return invalidResponse;
+    default:
+      return { message: 'Something went wrong. Please try again.', failureCategory: 'unknown' };
+  }
+}
+
 // --- Guest generation: browser -> Open Study Deck Cloudflare Function -> Google Gemini ---
 async function handleGuestGeneration() {
   if (!State.guestConfigLoaded) {
@@ -1100,7 +1242,13 @@ async function handleGuestGeneration() {
     return;
   }
   if (!State.guestConfig.guestModeEnabled || !State.guestConfig.turnstileSiteKey) {
-    showToast('Guest access is not available on this deployment. Please switch to "Use My Own Key".', 'error', 6000);
+    // Guest generation must fail closed here too — syncAccessModeUI() should
+    // already have disabled the radio and switched to BYOK, but this is the
+    // authoritative guard in case that hasn't run yet.
+    const message = State.guestConfigUnavailable
+      ? 'Guest Access is temporarily unavailable because its configuration could not be loaded. You can use BYOK or try again later.'
+      : 'Guest Access is currently disabled. You can continue using your own Gemini key.';
+    showToast(message, 'error', 6000);
     return;
   }
 
@@ -1224,31 +1372,117 @@ async function handleGuestGeneration() {
   }
 }
 
-async function executeWithFallback(ai, model, contents, schema, systemInstruction) {
+// Model used both as the existing hard-failure fallback and as the request
+// target for a compact retry (compact retry always reuses the ORIGINALLY
+// selected model, never this constant, unless they're already the same).
+const BYOK_FALLBACK_MODEL = 'gemini-2.5-flash';
+
+// Orchestrates a full BYOK generation, including the same call-policy cap
+// as the Guest path: at most 2 total Gemini calls.
+//   - If the first call throws (network/invalid key/quota/etc), try the
+//     existing model-fallback ONCE — never also attempt a compact retry
+//     after that (keeps the total at 2).
+//   - If the first call succeeds but the content is truncated/malformed
+//     specifically due to length, attempt ONE compact retry on the SAME
+//     model instead of switching models — output-limit issues are a
+//     length problem, not a reason to distrust the model choice.
+// Throws an Error with `.responseIssue`/`.completion` set for content-level
+// failures (safety block, malformed/invalid structure, empty, or a
+// still-failing compact retry) so the caller can show an actionable message.
+async function generateByokDeck({ ai, model, payloadObject, mode, subjectContext, sourceLength }) {
+  const maxOutputTokens = getOutputTokenBudget(mode);
+  const primaryModeConfig = buildModeConfig(mode, subjectContext, sourceLength);
+
+  let firstResponse;
+  let usedFallbackModel = false;
+  try {
+    firstResponse = await callGeminiSdk(ai, model, payloadObject, primaryModeConfig, maxOutputTokens);
+  } catch (err) {
+    if (model !== BYOK_FALLBACK_MODEL) {
+      console.warn(`Primary model call to ${model} failed, testing fallback '${BYOK_FALLBACK_MODEL}'...`, err);
+      firstResponse = await callGeminiSdk(ai, BYOK_FALLBACK_MODEL, payloadObject, primaryModeConfig, maxOutputTokens);
+      usedFallbackModel = true;
+    } else {
+      throw err;
+    }
+  }
+
+  const firstClassification = classifyGeneratedResponse({
+    mode,
+    text: extractSdkResponseText(firstResponse),
+    finishReason: extractSdkFinishReason(firstResponse)
+  });
+
+  if (firstClassification.issue === RESPONSE_ISSUE.OK) {
+    return { data: firstClassification.data, retried: false };
+  }
+
+  // A hard call-level fallback already happened for this generation — don't
+  // also spend a compact retry (never exceed 2 total calls).
+  if (usedFallbackModel || !isRetryableForLength(firstClassification.issue)) {
+    throw responseIssueError(firstClassification);
+  }
+
+  const compactModeConfig = buildModeConfig(mode, subjectContext, sourceLength, { compact: true });
+  const retryResponse = await callGeminiSdk(ai, model, payloadObject, compactModeConfig, maxOutputTokens);
+
+  const retryClassification = classifyGeneratedResponse({
+    mode,
+    text: extractSdkResponseText(retryResponse),
+    finishReason: extractSdkFinishReason(retryResponse)
+  });
+
+  if (retryClassification.issue === RESPONSE_ISSUE.OK) {
+    return { data: retryClassification.data, retried: true };
+  }
+
+  throw responseIssueError(retryClassification);
+}
+
+function responseIssueError(classification) {
+  const err = new Error(`model_response_issue:${classification.issue}`);
+  err.responseIssue = classification.issue;
+  err.completion = classification.completion;
+  return err;
+}
+
+async function callGeminiSdk(ai, model, payloadObject, modeConfig, maxOutputTokens) {
+  const { schema, systemInstruction, userPrompt } = modeConfig;
   const configObj = {
     responseMimeType: 'application/json',
     responseJsonSchema: schema,
     systemInstruction: systemInstruction,
-    temperature: 0.2
+    temperature: 0.2,
+    maxOutputTokens
   };
-  
+
+  return await ai.models.generateContent({
+    model: model,
+    contents: [payloadObject, userPrompt],
+    config: configObj
+  });
+}
+
+// The @google/genai response exposes a `.text` convenience getter, but some
+// SDK versions throw when accessing it on a response with no text parts
+// (safety block, MAX_TOKENS with no output yet). Fall back to reading the
+// candidate's parts directly — the same shape the Guest path reads from the
+// REST API, so both paths classify responses identically.
+function extractSdkResponseText(response) {
   try {
-    return await ai.models.generateContent({
-      model: model,
-      contents: contents,
-      config: configObj
-    });
+    if (response && typeof response.text === 'string') return response.text;
   } catch (err) {
-    console.warn(`Primary model call to ${model} failed, testing fallback 'gemini-2.5-flash'...`, err);
-    if (model !== 'gemini-2.5-flash') {
-      return await ai.models.generateContent({
-        model: 'gemini-2.5-flash',
-        contents: contents,
-        config: configObj
-      });
-    }
-    throw err;
+    // Fall through to manual extraction below.
   }
+  const candidate = response && Array.isArray(response.candidates) && response.candidates[0];
+  const parts = candidate && candidate.content && candidate.content.parts;
+  const textPart = Array.isArray(parts) ? parts.find(p => typeof p.text === 'string') : null;
+  return textPart ? textPart.text : null;
+}
+
+function extractSdkFinishReason(response) {
+  const candidate = response && Array.isArray(response.candidates) && response.candidates[0];
+  return candidate && candidate.finishReason;
 }
 
 // --- Toggle Generation UI states ---

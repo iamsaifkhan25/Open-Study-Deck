@@ -214,38 +214,38 @@
           <p>Generate study material context and preview visual outputs.</p>
         </header>
 
+        <div class="access-mode-bar">
+          <div class="access-mode-bar-row">
+            <div class="access-mode-bar-info">
+              <span class="section-label">Access Mode</span>
+              <p class="access-mode-bar-desc" id="access-mode-bar-desc">Try instantly as a guest with limited generations, or use your own Gemini key for extra quota.</p>
+              <button type="button" class="btn btn-secondary-sm guest-config-retry-btn" id="guest-config-retry-btn" style="display: none;">Retry Guest Access</button>
+            </div>
+            <div class="access-mode-pill-group" role="radiogroup" aria-label="Access Mode">
+              <label class="access-mode-pill" for="access-mode-guest">
+                <input type="radio" name="access-mode" id="access-mode-guest" value="guest" checked aria-describedby="guest-status-message">
+                <span class="access-mode-pill-content">Guest Access</span>
+              </label>
+              <label class="access-mode-pill" for="access-mode-byok">
+                <input type="radio" name="access-mode" id="access-mode-byok" value="byok">
+                <span class="access-mode-pill-content">Use My Own Key</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="guest-panel" id="guest-panel">
+            <div class="guest-quota-row">
+              <span class="guest-quota-text" id="guest-quota-text" role="status" aria-live="polite">Checking guest availability…</span>
+            </div>
+            <div id="turnstile-container" class="turnstile-container"></div>
+            <p class="guest-status-message" id="guest-status-message" role="status" aria-live="polite"></p>
+          </div>
+        </div>
+
         <div class="studio-workspace-grid">
-          
+
           <!-- LEFT SIDE: INPUT WORKSTATION -->
           <div class="workspace-card input-card">
-            <div class="access-mode-container">
-              <label class="section-label">Access Mode</label>
-              <div class="access-mode-grid">
-                <label class="access-mode-card" for="access-mode-guest">
-                  <input type="radio" name="access-mode" id="access-mode-guest" value="guest" checked aria-describedby="guest-status-message">
-                  <div class="access-mode-card-content">
-                    <span class="access-mode-title">Guest Access</span>
-                    <span class="access-mode-desc">Try Open Study Deck without configuring an API key. Guest generations are limited to protect the free service.</span>
-                  </div>
-                </label>
-                <label class="access-mode-card" for="access-mode-byok">
-                  <input type="radio" name="access-mode" id="access-mode-byok" value="byok">
-                  <div class="access-mode-card-content">
-                    <span class="access-mode-title">Use My Own Key</span>
-                    <span class="access-mode-desc">Use your personal Gemini API quota for additional generations and direct browser-to-Google requests.</span>
-                  </div>
-                </label>
-              </div>
-
-              <div class="guest-panel" id="guest-panel">
-                <div class="guest-quota-row">
-                  <span class="guest-quota-text" id="guest-quota-text" role="status" aria-live="polite">Checking guest availability…</span>
-                </div>
-                <div id="turnstile-container" class="turnstile-container"></div>
-                <p class="guest-status-message" id="guest-status-message" role="status" aria-live="polite"></p>
-              </div>
-            </div>
-
             <div class="tab-control">
               <button class="tab-btn active" id="tab-image" data-target="image-workplace">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
@@ -600,7 +600,7 @@
             <div class="instruction-timeline">
               <div class="timeline-step">
                 <div class="step-number">1</div>
-                <div class="step-desc">Go to <a href="https://aistudio.google.com/" target="_blank" rel="noopener">Google AI Studio</a>. Sign in with any free Google account.</div>
+                <div class="step-desc">Go to <a href="https://aistudio.google.com/api-keys" target="_blank" rel="noopener">Google AI Studio</a>. Sign in with any free Google account.</div>
               </div>
               <div class="timeline-step">
                 <div class="step-number">2</div>
@@ -853,7 +853,7 @@
               <div class="mt-4 leading-relaxed text-slate-600 dark:text-slate-400 text-base space-y-2">
                 <p>Obtaining a key takes under a minute, needs no credit card, and unlocks an <strong>ai text summarizer with no Open Study Deck signup</strong> required:</p>
                 <ol class="list-decimal pl-5 space-y-1 font-medium">
-                  <li>Navigate to the official <a href="https://aistudio.google.com/" target="_blank" rel="noopener" class="text-sky-500 hover:underline">Google AI Studio</a> page.</li>
+                  <li>Navigate to the official <a href="https://aistudio.google.com/api-keys" target="_blank" rel="noopener" class="text-sky-500 hover:underline">Google AI Studio</a> page.</li>
                   <li>Sign in with any standard Google account and click the blue <strong>"Get API Key"</strong> button on the sidebar.</li>
                   <li>Choose a project, click <strong>"Create API Key"</strong>, and copy your generated secret token.</li>
                 </ol>
@@ -1090,7 +1090,7 @@ Guest Access has a modest daily generation limit (shown above the generate butto
       <div class="instructions-accordion">
         <p class="instruction-text"><strong>How to get a free key:</strong></p>
         <ol class="instruction-list">
-          <li>Visit <a href="https://aistudio.google.com/" target="_blank" rel="noopener">Google AI Studio</a>.</li>
+          <li>Visit <a href="https://aistudio.google.com/api-keys" target="_blank" rel="noopener">Google AI Studio</a>.</li>
           <li>Click <strong>"Get API Key"</strong>.</li>
           <li>Select/create a project and copy the token.</li>
         </ol>

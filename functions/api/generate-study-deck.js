@@ -2,10 +2,18 @@
    POST /api/generate-study-deck
    Guest (no-API-key) study deck generation. The server uses its own Gemini
    credential (context.env.GEMINI_API_KEY) and a server-controlled model
-   (context.env.GEMINI_GUEST_MODEL) — the browser cannot choose either.
+   (context.env.GEMINI_GUEST_MODEL) — the browser cannot choose either, nor
+   can it influence the output-token budget or retry behaviour.
 
    Flow: validate input -> verify Turnstile -> check daily quota -> call
-   Gemini -> charge quota only on success -> return the deck.
+   Gemini (with at most one internal compact retry for length-driven
+   failures) -> charge quota only on final success -> return the deck.
+
+   Call policy: at most 2 Gemini calls per request — one normal attempt, and
+   one compact retry ONLY when the failure is specifically a length problem
+   (MAX_TOKENS / truncated JSON / incomplete-structure-at-the-limit). Invalid
+   keys, quota exhaustion, safety blocks, rate limits, and ordinary 4xx
+   errors are never retried.
 
    Never logs request/response content or the Gemini credential.
    ========================================================================== */
@@ -14,6 +22,10 @@ import {
   isValidStudyMode,
   sanitizeSubjectContext,
   buildModeConfig,
+  resolveGuestOutputTokenBudget,
+  classifyGeneratedResponse,
+  isRetryableForLength,
+  RESPONSE_ISSUE,
   MAX_TEXT_INPUT_LENGTH,
   ALLOWED_IMAGE_MIME_TYPES,
   MAX_GUEST_IMAGE_BYTES
@@ -156,26 +168,28 @@ export async function onRequestPost(context) {
       });
     }
 
-    // --- Build the prompt/schema from the validated mode only ---
-    let modeConfig;
-    try {
-      modeConfig = buildModeConfig(mode, safeSubjectContext);
-    } catch (err) {
-      return guestErrorResponse('INVALID_INPUT');
-    }
+    const sourceLength = inputType === 'text' ? contentPart.text.length : 0;
+    const maxOutputTokens = resolveGuestOutputTokenBudget(mode, env.GEMINI_GUEST_MAX_OUTPUT_TOKENS);
 
-    const geminiResult = await callGemini({
+    const geminiResult = await generateGuestDeck({
       apiKey: env.GEMINI_API_KEY,
       model: env.GEMINI_GUEST_MODEL,
       contentPart,
-      modeConfig
+      mode,
+      safeSubjectContext,
+      sourceLength,
+      maxOutputTokens
     });
+
+    // Safe diagnostic metadata only — never prompt/source/generated content.
+    console.log(`generate-study-deck: mode=${mode} ok=${geminiResult.ok} completion=${geminiResult.completion || 'n/a'} retried=${geminiResult.retried}`);
 
     if (!geminiResult.ok) {
       return guestErrorResponse(geminiResult.code);
     }
 
-    // Only charge quota for a successful generation.
+    // Only charge quota for a successful generation — the internal compact
+    // retry (if any) never consumes a second daily allowance.
     const newCount = await incrementGuestUsage(env.GUEST_USAGE, quotaKey, usage.count);
 
     return new Response(JSON.stringify({
@@ -200,7 +214,97 @@ export async function onRequestGet() {
   return guestErrorResponse('INVALID_INPUT');
 }
 
-async function callGemini({ apiKey, model, contentPart, modeConfig }) {
+// Maps an internal response-classification issue to a guest-facing
+// controlled error code. `completion` disambiguates issues that can arise
+// both from a hard MAX_TOKENS cutoff and from other causes.
+function mapResponseIssueToErrorCode(issue, completion) {
+  switch (issue) {
+    case RESPONSE_ISSUE.SAFETY_BLOCK:
+      return 'GEMINI_SAFETY_BLOCK';
+    case RESPONSE_ISSUE.EMPTY:
+      return 'RESPONSE_EMPTY';
+    case RESPONSE_ISSUE.MAX_TOKENS_NO_TEXT:
+      return 'RESPONSE_TOO_LONG';
+    case RESPONSE_ISSUE.TRUNCATED_JSON:
+      return completion === 'max_tokens' ? 'RESPONSE_TOO_LONG' : 'RESPONSE_INCOMPLETE';
+    case RESPONSE_ISSUE.INVALID_STRUCTURE:
+    case RESPONSE_ISSUE.MALFORMED_JSON:
+      return 'RESPONSE_INVALID_FORMAT';
+    default:
+      return 'UNKNOWN_ERROR';
+  }
+}
+
+// Orchestrates the full guest generation attempt, including the single
+// controlled compact retry. Returns { ok, data?, code?, retried, completion }.
+async function generateGuestDeck({ apiKey, model, contentPart, mode, safeSubjectContext, sourceLength, maxOutputTokens }) {
+  let primaryConfig;
+  try {
+    primaryConfig = buildModeConfig(mode, safeSubjectContext, sourceLength);
+  } catch (err) {
+    return { ok: false, code: 'INVALID_INPUT', retried: false };
+  }
+
+  const firstAttempt = await fetchGeminiOnce({ apiKey, model, contentPart, modeConfig: primaryConfig, maxOutputTokens });
+  if (!firstAttempt.httpOk) {
+    return { ok: false, code: firstAttempt.code, retried: false };
+  }
+
+  const firstClassification = classifyGeneratedResponse({
+    mode,
+    text: firstAttempt.text,
+    finishReason: firstAttempt.finishReason
+  });
+
+  if (firstClassification.issue === RESPONSE_ISSUE.OK) {
+    return { ok: true, data: firstClassification.data, retried: false, completion: firstClassification.completion };
+  }
+
+  if (!isRetryableForLength(firstClassification.issue)) {
+    return {
+      ok: false,
+      code: mapResponseIssueToErrorCode(firstClassification.issue, firstClassification.completion),
+      retried: false,
+      completion: firstClassification.completion
+    };
+  }
+
+  // --- One controlled compact retry, server-constructed instruction only ---
+  let compactConfig;
+  try {
+    compactConfig = buildModeConfig(mode, safeSubjectContext, sourceLength, { compact: true });
+  } catch (err) {
+    return { ok: false, code: 'INVALID_INPUT', retried: false };
+  }
+
+  const retryAttempt = await fetchGeminiOnce({ apiKey, model, contentPart, modeConfig: compactConfig, maxOutputTokens });
+  if (!retryAttempt.httpOk) {
+    return { ok: false, code: retryAttempt.code, retried: true };
+  }
+
+  const retryClassification = classifyGeneratedResponse({
+    mode,
+    text: retryAttempt.text,
+    finishReason: retryAttempt.finishReason
+  });
+
+  if (retryClassification.issue === RESPONSE_ISSUE.OK) {
+    return { ok: true, data: retryClassification.data, retried: true, completion: retryClassification.completion };
+  }
+
+  return {
+    ok: false,
+    code: mapResponseIssueToErrorCode(retryClassification.issue, retryClassification.completion),
+    retried: true,
+    completion: retryClassification.completion
+  };
+}
+
+// A single Gemini REST call. Returns either { httpOk: false, code } for
+// transport/HTTP/envelope-level failures, or { httpOk: true, text,
+// finishReason } for anything that got a normal candidate response — content
+// classification (empty/truncated/malformed/valid) happens one level up.
+async function fetchGeminiOnce({ apiKey, model, contentPart, modeConfig, maxOutputTokens }) {
   const { schema, systemInstruction, userPrompt } = modeConfig;
 
   const requestBody = {
@@ -214,7 +318,8 @@ async function callGemini({ apiKey, model, contentPart, modeConfig }) {
       // wrong one here caused Gemini to reject these schemas with
       // INVALID_ARGUMENT.
       responseJsonSchema: schema,
-      temperature: 0.2
+      temperature: 0.2,
+      maxOutputTokens
     }
   };
 
@@ -234,7 +339,7 @@ async function callGemini({ apiKey, model, contentPart, modeConfig }) {
     );
   } catch (err) {
     console.error('generate-study-deck: network error calling Gemini');
-    return { ok: false, code: 'GEMINI_SERVICE_UNAVAILABLE' };
+    return { httpOk: false, code: 'GEMINI_SERVICE_UNAVAILABLE' };
   }
 
   if (!response.ok) {
@@ -261,36 +366,27 @@ async function callGemini({ apiKey, model, contentPart, modeConfig }) {
       // Our own server-side key/config is the likely cause, not the guest's input.
       code = 'SERVER_CONFIGURATION_ERROR';
     }
-    return { ok: false, code };
+    return { httpOk: false, code };
   }
 
   let payload;
   try {
     payload = await response.json();
   } catch (err) {
-    return { ok: false, code: 'UNKNOWN_ERROR' };
+    return { httpOk: false, code: 'UNKNOWN_ERROR' };
+  }
+
+  // A prompt-level block (before any candidate is generated) surfaces here
+  // rather than on a candidate's finishReason.
+  if (payload && payload.promptFeedback && payload.promptFeedback.blockReason) {
+    return { httpOk: true, text: null, finishReason: 'SAFETY' };
   }
 
   const candidate = payload && Array.isArray(payload.candidates) && payload.candidates[0];
-  if (!candidate) {
-    return { ok: false, code: 'UNKNOWN_ERROR' };
-  }
-  if (candidate.finishReason === 'SAFETY' || candidate.finishReason === 'PROHIBITED_CONTENT') {
-    return { ok: false, code: 'GEMINI_SAFETY_BLOCK' };
-  }
+  const finishReason = candidate && candidate.finishReason;
+  const parts = candidate && candidate.content && candidate.content.parts;
+  const textPart = Array.isArray(parts) ? parts.find(p => typeof p.text === 'string') : null;
+  const text = textPart ? textPart.text : null;
 
-  const parts = candidate.content && candidate.content.parts;
-  const textPart = Array.isArray(parts) && parts[0] && parts[0].text;
-  if (!textPart) {
-    return { ok: false, code: 'UNKNOWN_ERROR' };
-  }
-
-  let parsed;
-  try {
-    parsed = JSON.parse(textPart);
-  } catch (err) {
-    return { ok: false, code: 'UNKNOWN_ERROR' };
-  }
-
-  return { ok: true, data: parsed };
+  return { httpOk: true, text, finishReason };
 }

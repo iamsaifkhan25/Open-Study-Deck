@@ -93,6 +93,7 @@ Add these as normal (non-secret) environment variables:
 | `GUEST_MODE_ENABLED` | `true` | Master on/off switch for Guest Access. |
 | `GUEST_DAILY_LIMIT` | `5` | Successful guest generations allowed per visitor per UTC day. |
 | `ALLOWED_ORIGINS` | `https://openstudydeck.com,https://www.openstudydeck.com` | Comma-separated allowlist checked against the request's `Origin` header as a defense-in-depth measure (Turnstile + KV quota are the primary abuse controls). Include local dev origins (e.g. `http://localhost:5173`) only in non-production environments. |
+| `GEMINI_GUEST_MAX_OUTPUT_TOKENS` | *(unset)* | Optional. Not secret. Overrides the mode-aware output-token budget (`shared/study-config.js` `OUTPUT_TOKEN_BUDGETS` — summary 4096, eli5 4096, flashcards 6144, notes 12288) for every guest generation, regardless of mode. Must be a safe integer between 256 and 16384; any missing or out-of-range value is ignored and the mode-aware default is used instead. The browser can never override this — it is only ever read from the server environment. |
 
 ## 10. Configure Production and Preview environments separately
 
