@@ -17,6 +17,7 @@ import {
   RESPONSE_ISSUE
 } from './shared/study-config.js';
 import { validateApiKeyFormat } from './shared/api-key-validation.js';
+import { mapByokErrorToFailure } from './shared/byok-error-mapping.js';
 import {
   initializeAnalyticsConsent,
   trackAnalyticsEvent
@@ -1143,28 +1144,22 @@ async function handleByokGeneration() {
     showToast('Study Card generated successfully!', 'success');
     trackAnalyticsEvent('generation_succeeded', { access_mode: 'byok', study_mode: State.selectedMode, input_type: input.inputType });
   } catch (err) {
-    console.error('Gemini API Error:', err);
-    let errorMsg = 'Failed to analyze contents. ';
-    let failureCategory = 'unknown';
+    let errorMsg;
+    let failureCategory;
 
     if (err.responseIssue) {
       const mapped = mapResponseIssueToByokMessage(err.responseIssue, err.completion);
       errorMsg = mapped.message;
       failureCategory = mapped.failureCategory;
-    } else if (err.message) {
-      if (err.message.includes('API key') || err.message.includes('400')) {
-        errorMsg += 'Invalid API Key. Please verify settings.';
-        failureCategory = 'invalid_key';
-      } else if (err.message.includes('Quota') || err.message.includes('429')) {
-        errorMsg += 'Request limit exceeded. Please wait a minute before retrying.';
-        failureCategory = 'quota';
-      } else {
-        errorMsg += err.message;
-      }
     } else {
-      errorMsg += 'Network failure or API server error.';
-      failureCategory = 'network';
+      const mapped = mapByokErrorToFailure(err);
+      errorMsg = mapped.message;
+      failureCategory = mapped.failureCategory;
     }
+
+    // Safe diagnostic only — HTTP status and our own category, never the
+    // key, the raw Google error body, or request/generated content.
+    console.error(`BYOK Gemini API error — category=${failureCategory} status=${err && typeof err.status === 'number' ? err.status : 'n/a'}`);
 
     showToast(errorMsg, 'error', 6000);
     trackAnalyticsEvent('generation_failed', { access_mode: 'byok', failure_category: failureCategory });
