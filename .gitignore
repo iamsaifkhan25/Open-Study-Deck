@@ -1,5 +1,7 @@
 node_modules/
 .wrangler/
+_worker.bundle
+bundle-meta.json
 dist/
 .cursor/
 .vscode/

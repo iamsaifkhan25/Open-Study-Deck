@@ -22,6 +22,7 @@ import {
   initializeAnalyticsConsent,
   trackAnalyticsEvent
 } from './analytics-consent.js';
+import { initRazorpayDonationFlow } from './shared/razorpay-donations.js';
 
 // --- Storage Keys ---
 // Same key name is reused across localStorage/sessionStorage (separate storage areas,
@@ -126,7 +127,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initSmoothScroll();
   initScrollAnimations();
   initModalHandlers();
-  initSupportHandlers();
+  initRazorpayDonationFlow({ notify: showToast });
   initAccessMode();
 
   // Ensure we start with the empty state on page refresh
@@ -2023,154 +2024,6 @@ function initModalHandlers() {
   if (fullscreenDownloadText) {
     fullscreenDownloadText.addEventListener('click', handleTextDownload);
   }
-}
-
-// --- Load Razorpay Script Dynamically ---
-const loadRazorpay = () => {
-  return new Promise((resolve) => {
-    if (window.Razorpay) {
-      resolve(true);
-      return;
-    }
-    const script = document.createElement('script');
-    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
-    script.onload = () => resolve(true);
-    script.onerror = () => resolve(false);
-    document.body.appendChild(script);
-  });
-};
-
-// --- Support Donation Tiers Form Handler ---
-function initSupportHandlers() {
-  const customRadio = document.getElementById('opt-custom');
-  const customInput = document.getElementById('custom-support-amount');
-  const allRadios = document.querySelectorAll('input[name="support-tier"]');
-  const submitBtn = document.getElementById('submit-support-btn');
-  const messageArea = document.getElementById('support-message');
-  
-  const customAmountGroup = document.getElementById('custom-amount-group');
-
-  allRadios.forEach(radio => {
-    radio.addEventListener('change', () => {
-      if (customRadio.checked) {
-        if (customAmountGroup) customAmountGroup.style.display = 'block';
-        if (!customInput.value) {
-          customInput.value = '20'; // set default value to prevent empty redirects
-        }
-        customInput.focus();
-        customInput.select(); // auto-select value so typing replaces it
-      } else {
-        if (customAmountGroup) customAmountGroup.style.display = 'none';
-        customInput.value = '';
-      }
-    });
-  });
-  
-  submitBtn.addEventListener('click', async () => {
-    let amount = 0;
-    
-    if (customRadio.checked) {
-      amount = parseFloat(customInput.value.trim());
-      if (isNaN(amount) || amount <= 0) {
-        showToast('Please enter a valid donation amount (e.g. 5, 20).', 'warning');
-        customInput.focus();
-        return;
-      }
-    } else {
-      const selectedRadio = document.querySelector('input[name="support-tier"]:checked');
-      amount = parseFloat(selectedRadio.value);
-    }
-    
-    const message = messageArea.value.trim();
-    
-    const originalText = submitBtn.innerText;
-    submitBtn.disabled = true;
-    submitBtn.innerText = 'Initializing...';
-
-    try {
-      const isLoaded = await loadRazorpay();
-      if (!isLoaded) {
-        showToast('Failed to load Razorpay payment gateway. Please check your internet connection.', 'error');
-        submitBtn.disabled = false;
-        submitBtn.innerText = originalText;
-        return;
-      }
-
-      const centsAmount = Math.round(amount * 100);
-      const orderRes = await fetch('/api/create-order', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          amount: centsAmount,
-          currency: 'USD'
-        })
-      });
-
-      if (!orderRes.ok) {
-        throw new Error('Failed to initiate order');
-      }
-
-      const orderData = await orderRes.json();
-      if (orderData.error) {
-        throw new Error(orderData.error);
-      }
-
-      const options = {
-        key: orderData.razorpayKeyId,
-        amount: orderData.amount,
-        currency: orderData.currency,
-        name: 'Open Study Deck',
-        description: 'Support the Creator',
-        order_id: orderData.id,
-        handler: function (response) {
-          showToast(`Thank you! Payment of $${amount} USD processed successfully.`, 'success', 5000);
-          
-          if (message) {
-            setTimeout(() => {
-              const mailtoSubject = `Support Message for Open Study Deck ($${amount})`;
-              const mailtoBody = `Hi! I have contributed $${amount} USD via Razorpay to support Open Study Deck.\n\nMessage:\n${message}\n\nPayment ID: ${response.razorpay_payment_id}`;
-              const mailtoUrl = `mailto:harukiwaves@zohomail.in?subject=${encodeURIComponent(mailtoSubject)}&body=${encodeURIComponent(mailtoBody)}`;
-              window.location.href = mailtoUrl;
-            }, 1000);
-          }
-
-          // Reset form states
-          document.getElementById('support-modal').style.display = 'none';
-          messageArea.value = '';
-          customInput.value = '';
-          if (customAmountGroup) customAmountGroup.style.display = 'none';
-          document.getElementById('opt-coffee').checked = true;
-          submitBtn.disabled = false;
-          submitBtn.innerText = originalText;
-        },
-        prefill: {
-          name: '',
-          email: '',
-          contact: ''
-        },
-        theme: {
-          color: '#18181b'
-        },
-        modal: {
-          ondismiss: function () {
-            submitBtn.disabled = false;
-            submitBtn.innerText = originalText;
-          }
-        }
-      };
-
-      const rzp = new window.Razorpay(options);
-      rzp.open();
-      submitBtn.innerText = 'In Progress...';
-    } catch (err) {
-      console.error(err);
-      showToast('Payment initialization failed. Please try again.', 'error');
-      submitBtn.disabled = false;
-      submitBtn.innerText = originalText;
-    }
-  });
 }
 
 // --- Dark Mode / Light Mode Theme Toggle Handler ---

@@ -36,8 +36,9 @@ Built after noticing students manually creating study notes with AI tools. Open 
 *   **Frontend Core:** HTML5, CSS3, Vanilla ES6+ Javascript Modules.
 *   **AI Engine (BYOK):** Official Google GenAI SDK (`@google/genai`) imported directly from CDN.
 *   **AI Engine (Guest):** A Cloudflare Pages Function (`functions/api/generate-study-deck.js`) calling the Gemini REST API with a server-side credential.
-*   **Bot Protection:** Cloudflare Turnstile for guest generation.
+*   **Bot Protection:** Cloudflare Turnstile for guest generation and donation order creation.
 *   **Guest Quota:** Cloudflare KV (`GUEST_USAGE`), storing only a salted hash of IP + date, never the raw IP.
+*   **Donations:** Razorpay Standard Checkout with Cloudflare Pages Functions for order creation, server-side payment confirmation, and signed webhook tracking. Razorpay remains the payment ledger; no payment database is required.
 *   **Analytics:** Consent-gated Google Analytics (`analytics-consent.js`), never loaded before explicit opt-in.
 *   **Export Pipeline:** `html2canvas-pro` for rendering CSS box models and complex borders.
 *   **Storage:** HTML5 LocalStorage & SessionStorage.
@@ -57,6 +58,7 @@ Live Site: [https://openstudydeck.com](https://openstudydeck.com)
 *   A web browser.
 *   Optional (for BYOK): a Google Gemini API key. Get one for free at [Google AI Studio](https://aistudio.google.com/) in 3 clicks without a credit card.
 *   Optional (for testing Guest Access locally): see [`docs/CLOUDFLARE_GUEST_AI_SETUP.md`](docs/CLOUDFLARE_GUEST_AI_SETUP.md).
+*   Optional (for Razorpay Test Mode): see [`docs/RAZORPAY_DONATION_WORKFLOW.md`](docs/RAZORPAY_DONATION_WORKFLOW.md).
 
 ### Local Development
 
@@ -65,14 +67,14 @@ Live Site: [https://openstudydeck.com](https://openstudydeck.com)
     ```bash
     npm install
     ```
-3.  Copy `.env.example` to `.env` and fill in any values you need locally (Razorpay, and optionally `GEMINI_API_KEY`/`GEMINI_GUEST_MODEL`/Turnstile/`RATE_LIMIT_SALT` to exercise Guest Access — see `.dev.vars.example` for the full list).
+3.  Copy `.env.example` to `.env` and fill in any values you need locally. Use Razorpay Test Mode credentials and a separate webhook signing secret; see `.dev.vars.example` for the production-parity variable list.
 4.  Run the local development server:
     ```bash
     npm run dev
     ```
-5.  Open the local address (typically `http://localhost:5173`) in your browser. `npm run dev` already mocks `/api/generate-study-deck` and `/api/public-config` using the real Cloudflare Function handlers, so Guest Access can be exercised locally without Wrangler.
+5.  Open the local address (typically `http://localhost:5173`) in your browser. `npm run dev` routes Guest Access and Razorpay API requests through the same Pages Function handlers used in production; external provider calls still require the corresponding local Test Mode credentials.
 
-For production-parity testing of Cloudflare bindings (real KV, real Turnstile), see `docs/CLOUDFLARE_GUEST_AI_SETUP.md`.
+For production-parity Cloudflare testing, see `docs/CLOUDFLARE_GUEST_AI_SETUP.md` and `docs/RAZORPAY_DONATION_WORKFLOW.md`. Production normally deploys from the Git-connected `master` branch. `npm run deploy:manual` is reserved for an explicit manual recovery release so the same commit is not deployed twice.
 
 ---
 
@@ -85,7 +87,7 @@ Open Study Deck uses a privacy-conscious, browser-first architecture. Your libra
 *   **BYOK:** your API key is stored in `sessionStorage` by default, or in `localStorage` only if you opt in via "Remember this key on this device." Your key and content are sent directly from your browser to Google Gemini; Open Study Deck never sees or proxies that request.
 *   Google Analytics is consent-based and never loads before you explicitly allow it. No study content, generated answers, or credentials are ever sent as analytics data.
 *   PNG exports are rendered programmatically inside your browser DOM (client-side canvas screenshotting).
-*   The contact form and donation flow send data to FormSubmit and Razorpay respectively — see the [Privacy Policy](https://openstudydeck.com/privacy) for details.
+*   The contact form and donation flow send data to FormSubmit and Razorpay respectively. Open Study Deck stores no payment database; payment state is verified server-side and Razorpay remains the durable ledger. See the [Privacy Policy](https://openstudydeck.com/privacy) for details.
 *   AI-generated content can be inaccurate; verify anything important before academic use.
 
 ---

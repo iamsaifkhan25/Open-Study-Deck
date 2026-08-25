@@ -145,7 +145,7 @@
           <p class="settings-card-text">Some parts of the site collect information only because you choose to submit it:</p>
           <ul class="settings-card-text" style="list-style-type: disc; margin-left: var(--space-lg); space-y: var(--space-xs);">
             <li><strong>Contact form:</strong> the name, email address, and message you enter are sent via FormSubmit to the developer's inbox.</li>
-            <li><strong>Donations:</strong> if you choose to support the project financially, payment details are handled by Razorpay's checkout flow. Open Study Deck does not directly collect or store your card or payment information.</li>
+            <li><strong>Donations:</strong> if you choose to support the project financially, card, bank, contact, and other checkout details are collected and processed by Razorpay, not by an Open Study Deck payment form. Open Study Deck's Cloudflare Functions create the order, authenticate Razorpay's payment result, and receive signed lifecycle webhooks. Open Study Deck does not operate a payment database; limited workflow logs may contain the Razorpay order, payment, or event ID, amount, currency, and status, while Razorpay retains the transaction record. Your optional support message is not sent to Razorpay or stored by the site; after a confirmed payment, your browser may prepare it in an email addressed to the developer.</li>
           </ul>
 
           <hr class="card-divider">
@@ -154,10 +154,10 @@
           <p class="settings-card-text">The application currently relies on the following third-party services. Each can receive ordinary technical request information (such as your IP address, browser/user-agent string, and the resource requested) as a normal part of serving their content, in addition to anything described above:</p>
           <ul class="settings-card-text" style="list-style-type: disc; margin-left: var(--space-lg); space-y: var(--space-xs);">
             <li><strong>Google Gemini API:</strong> processes the text/images and, in BYOK mode, your API key, to generate study decks. Governed by Google's terms and privacy policy.</li>
-            <li><strong>Cloudflare (Pages Functions, KV, Turnstile):</strong> hosts the Guest Access gateway, temporarily stores hashed guest-quota records, and verifies the Turnstile bot-protection challenge.</li>
+            <li><strong>Cloudflare (Pages Functions, KV, Turnstile):</strong> hosts the Guest Access and payment-verification gateways, temporarily stores hashed guest-quota records, verifies Turnstile challenges, and may retain ordinary Function logs including the limited donation workflow fields described in Section 8.</li>
             <li><strong>Google Analytics:</strong> aggregate product analytics, loaded only after you grant consent. See Section 7.</li>
             <li><strong>FormSubmit:</strong> forwards Contact page submissions (name, email, message) to the developer's inbox.</li>
-            <li><strong>Razorpay:</strong> processes payment information for voluntary donations.</li>
+            <li><strong>Razorpay:</strong> hosts checkout, processes payment information for voluntary donations, and retains the authoritative order and transaction record under its applicable terms and privacy policy.</li>
             <li><strong>Google Fonts:</strong> serves the Inter and JetBrains Mono webfonts used across the site.</li>
             <li><strong>jsDelivr:</strong> a CDN used to load the html2canvas library and the Google GenAI SDK used to call Gemini in BYOK mode.</li>
             <li><strong>Tailwind CDN:</strong> loads Tailwind's utility CSS engine used for portions of the layout.</li>
